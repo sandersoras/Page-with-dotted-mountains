@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Strid — Concept preview</title>
+<meta name="description" content="Strid — concept preview, not the live site." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+<style>
+  .exp-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 32px 0;
+  }
+  .exp-nav .logo-mark { width: 18px; height: 18px; }
+  .exp-nav-links { display: flex; gap: 32px; font-size: 14px; color: var(--ink-dim); }
+
+  /* True viewport-centered text: 100vh minus the nav bar's own height
+     (which sits above this in normal flow and would otherwise push the
+     centered content down by that same amount). */
+  .giant-hero {
+    min-height: calc(100vh - 143px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  /* hero-frame is taller than 100vh on purpose — that extra height is
+     what pushes the terrain (anchored to its bottom) further down,
+     without touching the terrain's own crop/sizing at all. */
+  .hero-frame {
+    position: relative;
+    min-height: calc(100vh + 90px);
+  }
+  .giant-wordmark {
+    display: flex;
+    align-items: center;
+    gap: clamp(24px, 4vw, 52px);
+    margin-bottom: 28px;
+    /* shared sizing basis — icon height is set in em against this, so it
+       always tracks the STRID letter height exactly, at every viewport width */
+    font-size: clamp(5rem, 15vw, 13rem);
+  }
+  .giant-wordmark .logo-mark {
+    width: 0.72em;
+    height: 0.72em;
+    flex-shrink: 0;
+  }
+  .giant-wordmark h1 {
+    font-size: 1em;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .giant-sub {
+    font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: var(--ink-dim);
+    max-width: 28ch;
+    line-height: 1.5;
+    margin-top: 8px;
+  }
+  .giant-sub .a-accent { color: var(--accent); font-weight: 600; }
+
+  .scroll-cue {
+    position: absolute;
+    z-index: 1;
+    bottom: 28px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+
+  /* Product intro section */
+  .product-intro {
+    padding: 120px 0 140px;
+    text-align: center;
+  }
+  .product-intro .eyebrow { display: block; text-align: center; margin: 0 auto 20px; }
+  .product-intro h2 {
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin-bottom: 44px;
+  }
+  .product-intro img {
+    max-width: 900px;
+    width: 100%;
+    display: block;
+    margin: 0 auto;
+  }
+  .product-intro p {
+    max-width: 50ch;
+    margin: 32px auto 0;
+    color: var(--ink-dim);
+    font-size: 1.05rem;
+  }
+
+  .hero-terrain {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Tall enough that "cover + bottom" doesn't crop into the tallest
+       peak (left band summit sits at ~52% down the source image). */
+    height: 460px;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+    /* No CSS fade here on purpose — the source image already fades to
+       nothing naturally at its own bottom edge (and thins out toward its
+       peaks), so masking on top of that just fights the asset. */
+  }
+  .hero-terrain img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: bottom center;
+    display: block;
+  }
+  @media (max-width: 720px) {
+    .hero-terrain { height: 220px; }
+  }
+  .giant-hero, .exp-nav { position: relative; z-index: 1; }
+</style>
+</head>
+<body>
+
+<div class="noise" aria-hidden="true"></div>
+
+<section class="hero-frame">
+  <div class="hero-terrain" aria-hidden="true">
+    <img src="assets/bakgrunn-transparent.png" alt="" />
+  </div>
+  <div class="wrap">
+    <div class="exp-nav">
+      <a href="#" class="logo">
+        <img src="assets/logo-mark.png" class="logo-mark" alt="" />
+        STRID
+      </a>
+      <div class="exp-nav-links"><span>Thesis</span><span>Product</span><span>Mission</span><span>Contact</span></div>
+    </div>
+
+    <div class="giant-hero">
+      <div class="giant-wordmark">
+        <img src="assets/logo-mark.png" class="logo-mark" alt="" />
+        <h1>STRID</h1>
+      </div>
+      <p class="giant-sub">Advancing the <span class="a-accent">frontline</span> for allied forces.</p>
+    </div>
+  </div>
+  <span class="scroll-cue">Scroll — Strid One below</span>
+</section>
+
+<section class="product-intro">
+  <div class="wrap">
+    <span class="eyebrow">Product</span>
+    <h2>STRID One</h2>
+    <img src="assets/strid-one-render.png" alt="STRID One autonomous carrier render" />
+    <p>A fixed-wing autonomous aircraft engineered as a mothership for smaller quadcopters — placeholder copy, not final.</p>
+  </div>
+</section>
+
+</body>
+</html>
