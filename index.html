@@ -10,6 +10,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles.css" />
 <style>
+  /* The header is a real sibling of the sections (not nested in the hero),
+     so it sticks for the whole page. Because it now sits above .hero-frame
+     in normal flow rather than inside it, every viewport-relative height
+     below has to subtract its height to land where the approved mockup did. */
+  :root { --nav-h: 95px; }
+
+  .exp-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
+  }
   .exp-nav {
     display: flex;
     justify-content: space-between;
@@ -19,9 +31,17 @@
   .exp-nav .logo-mark { width: 18px; height: 18px; }
   .exp-nav-links { display: flex; gap: 32px; font-size: 14px; color: var(--ink-dim); }
 
-  /* True viewport-centered text: 100vh minus the nav bar's own height
-     (which sits above this in normal flow and would otherwise push the
-     centered content down by that same amount). */
+  /* Ends exactly at the bottom of the visible screen, so the scroll-cue's
+     bottom offset is measured against the viewport rather than against the
+     taller .hero-frame — that's what keeps the cue on screen before scrolling. */
+  .hero-viewport {
+    position: relative;
+    height: calc(100vh - var(--nav-h));
+    z-index: 1;
+  }
+  /* 143px, not the nav height, is the empirically tuned offset that puts the
+     giant type's optical centre on the screen's centre — simple box math is
+     off here because of the display face's ascender/descender asymmetry. */
   .giant-hero {
     min-height: calc(100vh - 143px);
     display: flex;
@@ -30,20 +50,20 @@
     justify-content: center;
     text-align: center;
   }
-  /* hero-frame is taller than 100vh on purpose — that extra height is
-     what pushes the terrain (anchored to its bottom) further down,
-     without touching the terrain's own crop/sizing at all. */
+  /* Taller than one screen on purpose — the extra height is what pushes the
+     terrain (anchored to this box's bottom) further down, without touching
+     the terrain's own crop or sizing. */
+  /* The +116px is the previously approved +90px plus 26px — the ink width
+     of the "I" in the wordmark at its full display size. */
   .hero-frame {
     position: relative;
-    min-height: calc(100vh + 90px);
+    min-height: calc(100vh + 116px - var(--nav-h));
   }
   .giant-wordmark {
     display: flex;
     align-items: center;
     gap: clamp(24px, 4vw, 52px);
     margin-bottom: 28px;
-    /* shared sizing basis — icon height is set in em against this, so it
-       always tracks the STRID letter height exactly, at every viewport width */
     font-size: clamp(5rem, 15vw, 13rem);
   }
   .giant-wordmark .logo-mark {
@@ -71,40 +91,51 @@
   .scroll-cue {
     position: absolute;
     z-index: 1;
-    bottom: 28px;
+    bottom: 29px;
     left: 0;
     right: 0;
-    text-align: center;
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: 0.1em;
-    color: var(--ink-faint);
-    text-transform: uppercase;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
-
-  /* Product intro section */
-  .product-intro {
-    padding: 120px 0 140px;
-    text-align: center;
+  /* Local clearing in the terrain so the cue reads against the flat page
+     colour instead of competing with the point-cloud texture behind it.
+     Sits inside the cue's own stacking context: above the terrain, below
+     the label and chevrons. */
+  .scroll-cue::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 128px;
+    height: 86px;
+    transform: translate(-50%, -50%);
+    background: radial-gradient(
+      ellipse at center,
+      rgba(231, 229, 223, 0.82) 0%,
+      rgba(231, 229, 223, 0.5) 45%,
+      rgba(231, 229, 223, 0) 75%
+    );
+    z-index: -1;
+    pointer-events: none;
   }
-  .product-intro .eyebrow { display: block; text-align: center; margin: 0 auto 20px; }
-  .product-intro h2 {
-    font-size: clamp(2.4rem, 5vw, 4rem);
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    margin-bottom: 44px;
+  .scroll-cue-chevrons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    animation: scroll-cue-bob 2.2s ease-in-out infinite;
   }
-  .product-intro img {
-    max-width: 900px;
-    width: 100%;
-    display: block;
-    margin: 0 auto;
+  .scroll-cue-chevrons svg { width: 24px; height: 16px; color: var(--ink-dim); }
+  .scroll-cue-chevrons svg:last-child { opacity: 0.4; margin-top: -4px; }
+  /* Only the arrows bob — a moving halo would make the terrain behind it
+     visibly breathe. */
+  @keyframes scroll-cue-bob {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(5px); }
   }
-  .product-intro p {
-    max-width: 50ch;
-    margin: 32px auto 0;
-    color: var(--ink-dim);
-    font-size: 1.05rem;
+  @media (prefers-reduced-motion: reduce) {
+    .scroll-cue-chevrons { animation: none; }
   }
 
   .hero-terrain {
@@ -112,15 +143,10 @@
     left: 0;
     right: 0;
     bottom: 0;
-    /* Tall enough that "cover + bottom" doesn't crop into the tallest
-       peak (left band summit sits at ~52% down the source image). */
     height: 460px;
     overflow: hidden;
     pointer-events: none;
     z-index: 0;
-    /* No CSS fade here on purpose — the source image already fades to
-       nothing naturally at its own bottom edge (and thins out toward its
-       peaks), so masking on top of that just fights the asset. */
   }
   .hero-terrain img {
     width: 100%;
@@ -131,18 +157,108 @@
   }
   @media (max-width: 720px) {
     .hero-terrain { height: 220px; }
+    .scroll-cue { bottom: 24px; }
+    .scroll-cue::before { width: 112px; height: 76px; }
+    /* The links are non-functional placeholders in this mockup and there
+       isn't room for them beside the wordmark — drop them rather than let
+       them overrun the logo. */
+    .exp-nav-links { display: none; }
+    .exp-nav { padding: 20px 0; }
+    :root { --nav-h: 60px; }
+    .giant-hero { min-height: calc(100vh - 108px); }
+    /* Keep the desktop +26px nudge off mobile — the terrain crop is only
+       220px here and already sits mostly below the fold, so pushing it
+       further just hides the mountains entirely. */
+    .hero-frame { min-height: calc(100vh + 90px - var(--nav-h)); }
   }
-  .giant-hero, .exp-nav { position: relative; z-index: 1; }
+
+  /* ---- Product: pinned scroll-driven sequence ---- */
+  .product-pin {
+    position: relative;
+    height: 280vh;
+  }
+  .product-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+  .product-stage {
+    position: relative;
+    width: 100%;
+  }
+  .product-heading {
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    text-align: center;
+    margin-bottom: 8px;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.9s cubic-bezier(.16,1,.3,1), transform 0.9s cubic-bezier(.16,1,.3,1);
+  }
+  .product-heading.is-visible { opacity: 1; transform: translateY(0); }
+
+  .product-visual {
+    margin-top: 24px;
+    opacity: 0;
+    transition: opacity 0.9s ease;
+  }
+  .product-visual.is-visible { opacity: 1; }
+  .product-plane {
+    display: block;
+    max-width: 640px;
+    width: 100%;
+    margin: 0 auto;
+    will-change: transform;
+  }
+
+  .product-specs {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+  }
+  .spec-row { display: flex; flex-direction: column; gap: 3px; }
+  .spec-k {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .spec-v { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; }
+
+  /* ---- Problem/solution section ---- */
+  .problem-section {
+    padding: 160px 0;
+  }
+  .problem-section .eyebrow { display: block; margin-bottom: 24px; }
+  .problem-text {
+    font-size: clamp(1.3rem, 2.4vw, 1.8rem);
+    line-height: 1.55;
+    max-width: 42ch;
+    color: var(--ink-dim);
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.9s cubic-bezier(.16,1,.3,1), transform 0.9s cubic-bezier(.16,1,.3,1);
+  }
+  .problem-text.is-visible { opacity: 1; transform: translateY(0); }
 </style>
 </head>
 <body>
 
 <div class="noise" aria-hidden="true"></div>
 
-<section class="hero-frame">
-  <div class="hero-terrain" aria-hidden="true">
-    <img src="assets/bakgrunn-transparent.png" alt="" />
-  </div>
+<header class="exp-header">
   <div class="wrap">
     <div class="exp-nav">
       <a href="#" class="logo">
@@ -151,26 +267,117 @@
       </a>
       <div class="exp-nav-links"><span>Thesis</span><span>Product</span><span>Mission</span><span>Contact</span></div>
     </div>
+  </div>
+</header>
 
-    <div class="giant-hero">
-      <div class="giant-wordmark">
-        <img src="assets/logo-mark.png" class="logo-mark" alt="" />
-        <h1>STRID</h1>
+<section class="hero-frame">
+  <div class="hero-terrain" aria-hidden="true">
+    <img src="assets/bakgrunn-transparent.png" alt="" />
+  </div>
+  <div class="hero-viewport">
+    <div class="wrap">
+      <div class="giant-hero">
+        <div class="giant-wordmark">
+          <img src="assets/logo-mark.png" class="logo-mark" alt="" />
+          <h1>STRID</h1>
+        </div>
+        <p class="giant-sub">Advancing the <span class="a-accent">frontline</span> for allied forces.</p>
       </div>
-      <p class="giant-sub">Advancing the <span class="a-accent">frontline</span> for allied forces.</p>
+    </div>
+    <div class="scroll-cue" aria-hidden="true">
+      <div class="scroll-cue-chevrons">
+        <svg viewBox="0 0 24 16" fill="none"><path d="M2 2L12 12L22 2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <svg viewBox="0 0 24 16" fill="none"><path d="M2 2L12 12L22 2" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
     </div>
   </div>
-  <span class="scroll-cue">Scroll — Strid One below</span>
 </section>
 
-<section class="product-intro">
-  <div class="wrap">
-    <span class="eyebrow">Product</span>
-    <h2>STRID One</h2>
-    <img src="assets/strid-one-render.png" alt="STRID One autonomous carrier render" />
-    <p>A fixed-wing autonomous aircraft engineered as a mothership for smaller quadcopters — placeholder copy, not final.</p>
+<section class="product-pin" id="product">
+  <div class="product-sticky">
+    <div class="wrap product-stage">
+      <h2 class="product-heading">STRID One</h2>
+      <div class="product-visual">
+        <img src="assets/strid-one-render.png" class="product-plane" alt="STRID One autonomous carrier render" />
+      </div>
+      <div class="product-specs">
+        <div class="spec-row"><span class="spec-k">Wingspan</span><span class="spec-v">3.5m</span></div>
+        <div class="spec-row"><span class="spec-k">Propulsion</span><span class="spec-v">Electric</span></div>
+        <div class="spec-row"><span class="spec-k">Flight</span><span class="spec-v">VTOL</span></div>
+        <div class="spec-row"><span class="spec-k">Status</span><span class="spec-v">In development</span></div>
+      </div>
+    </div>
   </div>
 </section>
+
+<section class="problem-section">
+  <div class="wrap">
+    <span class="eyebrow">Why it matters</span>
+    <p class="problem-text">Placeholder copy — not final. Expendable drones got cheap, but that didn't change the war. What actually decides an engagement is getting the right capability to the objective, again and again, without paying full price every single time. STRID One is a first answer to that problem.</p>
+  </div>
+</section>
+
+<script>
+  (function () {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // --- Product entrance: heading fades in, then the plane shortly after ---
+    const productPin = document.querySelector('.product-pin');
+    const heading = document.querySelector('.product-heading');
+    const visual = document.querySelector('.product-visual');
+    const specs = document.querySelector('.product-specs');
+    const plane = document.querySelector('.product-plane');
+
+    const entranceObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        heading.classList.add('is-visible');
+        setTimeout(() => visual.classList.add('is-visible'), prefersReducedMotion ? 0 : 450);
+        entranceObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.15 });
+    entranceObserver.observe(productPin);
+
+    // --- Scroll-driven pin animation: plane slides right, then specs reveal ---
+    let ticking = false;
+    function updateProductScroll() {
+      ticking = false;
+      const rect = productPin.getBoundingClientRect();
+      const scrollableDistance = productPin.offsetHeight - window.innerHeight;
+      if (scrollableDistance <= 0) return;
+      const scrolled = -rect.top;
+      const progress = Math.min(Math.max(scrolled / scrollableDistance, 0), 1);
+
+      // Plane slide happens across the 15%-65% range of the pin scroll.
+      const slideProgress = Math.min(Math.max((progress - 0.15) / 0.5, 0), 1);
+      const slideDistance = Math.min(280, window.innerWidth * 0.22);
+      plane.style.transform = prefersReducedMotion ? '' : `translateX(${slideProgress * slideDistance}px)`;
+
+      // Specs reveal once the slide is mostly done, staying visible through
+      // the rest of the pin range (the "hold" before releasing to the next section).
+      const specsProgress = Math.min(Math.max((progress - 0.55) / 0.2, 0), 1);
+      specs.style.opacity = String(specsProgress);
+    }
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        ticking = true;
+        requestAnimationFrame(updateProductScroll);
+      }
+    }, { passive: true });
+    updateProductScroll();
+
+    // --- Problem section fade-in ---
+    const problemText = document.querySelector('.problem-text');
+    const problemObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        problemText.classList.add('is-visible');
+        problemObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.3 });
+    problemObserver.observe(problemText);
+  })();
+</script>
 
 </body>
 </html>
