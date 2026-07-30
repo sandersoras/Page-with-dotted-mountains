@@ -235,11 +235,24 @@
     .exp-nav-links { display: none; }
     .exp-nav { padding: 20px 0; }
     :root { --nav-h: 60px; }
-    .giant-hero { min-height: calc(100vh - 108px); }
-    /* Keep the desktop +26px nudge off mobile — the terrain crop is only
-       220px here and already sits mostly below the fold, so pushing it
-       further just hides the mountains entirely. */
-    .hero-frame { min-height: calc(100vh + 90px - var(--nav-h)); }
+
+    /* Sit the wordmark higher than dead centre and pull the ridge up with it,
+       so the mountains are on screen the moment the page opens instead of
+       waiting below the fold. Desktop keeps its own tuned values — none of
+       this leaves the media query.
+
+       Each pair declares vh first and svh second on purpose. iOS Safari's vh
+       is the height with the browser chrome *hidden*, so anything anchored to
+       it starts lower than the part you can actually see on load; svh is the
+       visible height. Browsers without svh simply keep the vh line. */
+    .hero-viewport { height: calc(100vh - var(--nav-h)); }
+    .hero-viewport { height: calc(100svh - var(--nav-h)); }
+
+    .giant-hero { min-height: calc(100vh - 300px); }
+    .giant-hero { min-height: calc(100svh - 300px); }
+
+    .hero-frame { min-height: calc(100vh - 30px); }
+    .hero-frame { min-height: calc(100svh - 30px); }
   }
 
   /* ---- Product: pinned scroll-driven sequence ---- */
