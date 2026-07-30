@@ -29,7 +29,6 @@
     padding: 32px 0;
   }
   .exp-nav .logo-mark { width: 18px; height: 18px; }
-  .exp-nav-right { display: flex; align-items: center; gap: 40px; }
   .exp-nav-links { display: flex; gap: 32px; font-size: 14px; }
   .exp-nav-links a {
     position: relative;
@@ -51,24 +50,7 @@
   .exp-nav-links a:hover { color: var(--ink); }
   .exp-nav-links a:hover::after { transform: scaleX(1); }
 
-  /* A real clock, not decoration — an ops brand should look like something
-     is running. It's the cheapest honest signal of life on the page. */
-  .nav-status {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-family: var(--mono);
-    font-size: 10.5px;
-    letter-spacing: 0.12em;
-    color: var(--ink-faint);
-    white-space: nowrap;
-  }
-  .nav-dot {
-    width: 5px; height: 5px;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: status-pulse 2.8s ease-in-out infinite;
-  }
+  /* Still used by the active domain marker in the Doctrine list. */
   @keyframes status-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
 
   .scroll-progress {
@@ -253,6 +235,21 @@
 
     .hero-frame { min-height: calc(100vh - 30px); }
     .hero-frame { min-height: calc(100svh - 30px); }
+
+    /* Lift the ridge with its own offset rather than by shrinking .hero-frame.
+       Past a point the frame's min-height falls below its content height
+       (.hero-viewport) and stops controlling anything, so the terrain would
+       just stop moving. */
+    .hero-terrain { bottom: 40px; }
+
+    /* Scale up inside the crop rather than growing the box, so the container
+       height the layout is tuned against stays fixed. Anchored to the bottom
+       so the enlarged view stays on the dense part of the ridge instead of
+       drifting into the faded tail. */
+    .hero-terrain img {
+      transform: scale(1.4);
+      transform-origin: bottom center;
+    }
   }
 
   /* ---- Product: pinned scroll-driven sequence ---- */
@@ -518,11 +515,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     [data-reveal] { opacity: 1; transform: none; transition: none; }
-    .nav-dot, .domain-row.is-active .domain-mark { animation: none; }
-  }
-
-  @media (max-width: 900px) {
-    .nav-status { display: none; }
+    .domain-row.is-active .domain-mark { animation: none; }
   }
 
   @media (max-width: 720px) {
@@ -553,18 +546,12 @@
         <img src="assets/logo-mark.png" class="logo-mark" alt="" />
         STRID
       </a>
-      <div class="exp-nav-right">
-        <nav class="exp-nav-links">
-          <a href="#product">Product</a>
-          <a href="#thesis">Thesis</a>
-          <a href="#doctrine">Doctrine</a>
-          <a href="#contact">Contact</a>
-        </nav>
-        <span class="nav-status">
-          <span class="nav-dot" aria-hidden="true"></span>
-          OSLO <span id="osloClock">--:--:--</span>
-        </span>
-      </div>
+      <nav class="exp-nav-links">
+        <a href="#product">Product</a>
+        <a href="#thesis">Thesis</a>
+        <a href="#doctrine">Doctrine</a>
+        <a href="#contact">Contact</a>
+      </nav>
     </div>
   </div>
   <span class="scroll-progress" id="scrollProgress" aria-hidden="true"></span>
@@ -664,20 +651,20 @@
 
     <div class="contact-fields">
       <div class="field" data-reveal data-reveal-step="0">
-        <span class="field-k">Email</span>
-        <a class="field-v" href="mailto:ops@strid.defense">ops@strid.defense</a>
+        <span class="field-k">Chief executive</span>
+        <a class="field-v" href="mailto:sander@strid.so">sander@strid.so</a>
       </div>
       <div class="field" data-reveal data-reveal-step="1">
+        <span class="field-k">Chief technology</span>
+        <a class="field-v" href="mailto:viktor@strid.so">viktor@strid.so</a>
+      </div>
+      <div class="field" data-reveal data-reveal-step="2">
         <span class="field-k">Location</span>
         <span class="field-v">Oslo, Norway</span>
       </div>
-      <div class="field" data-reveal data-reveal-step="2">
-        <span class="field-k">Programme</span>
-        <span class="field-v">In development</span>
-      </div>
     </div>
 
-    <a class="cta" href="mailto:ops@strid.defense" data-reveal data-reveal-step="3">
+    <a class="cta" href="mailto:sander@strid.so" data-reveal data-reveal-step="3">
       Request briefing <span class="cta-arrow" aria-hidden="true">→</span>
     </a>
   </div>
@@ -852,9 +839,14 @@
     }
 
     // Gate the load-triggered runs on webfonts, so the width measurement above
-    // happens against the real face rather than the fallback.
+    // happens against the real face rather than the fallback. Raced against a
+    // timeout: if fonts.ready stalls the hero would sit scrambled forever, and
+    // a slightly-off width measurement beats a headline that never resolves.
     const fontsReady = (document.fonts && document.fonts.ready)
-      ? document.fonts.ready
+      ? Promise.race([
+          document.fonts.ready,
+          new Promise((resolve) => setTimeout(resolve, 1200))
+        ])
       : Promise.resolve();
 
     const targets = [
@@ -983,20 +975,6 @@
       }
     }, { passive: true });
     updateAmbient();
-
-    // --- Oslo clock ---
-    const clock = document.getElementById('osloClock');
-    function tickClock() {
-      try {
-        clock.textContent = new Intl.DateTimeFormat('en-GB', {
-          timeZone: 'Europe/Oslo', hour: '2-digit', minute: '2-digit',
-          second: '2-digit', hour12: false
-        }).format(new Date());
-      } catch (err) {
-        clock.textContent = new Date().toTimeString().slice(0, 8);
-      }
-    }
-    if (clock) { tickClock(); setInterval(tickClock, 1000); }
   })();
 </script>
 
