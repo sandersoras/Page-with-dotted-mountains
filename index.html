@@ -29,7 +29,61 @@
     padding: 32px 0;
   }
   .exp-nav .logo-mark { width: 18px; height: 18px; }
-  .exp-nav-links { display: flex; gap: 32px; font-size: 14px; color: var(--ink-dim); }
+  .exp-nav-right { display: flex; align-items: center; gap: 40px; }
+  .exp-nav-links { display: flex; gap: 32px; font-size: 14px; }
+  .exp-nav-links a {
+    position: relative;
+    color: var(--ink-dim);
+    text-decoration: none;
+    padding-bottom: 3px;
+    transition: color 0.2s ease;
+  }
+  .exp-nav-links a::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.28s cubic-bezier(.16,1,.3,1);
+  }
+  .exp-nav-links a:hover { color: var(--ink); }
+  .exp-nav-links a:hover::after { transform: scaleX(1); }
+
+  /* A real clock, not decoration — an ops brand should look like something
+     is running. It's the cheapest honest signal of life on the page. */
+  .nav-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+  .nav-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: status-pulse 2.8s ease-in-out infinite;
+  }
+  @keyframes status-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
+
+  .scroll-progress {
+    position: absolute;
+    left: 0; bottom: -1px;
+    height: 2px;
+    width: 100%;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    z-index: 21;
+  }
+
+  /* Sticky header would otherwise sit on top of anchor targets. */
+  #product, #thesis, #doctrine, #contact { scroll-margin-top: 96px; }
 
   /* Ends exactly at the bottom of the visible screen, so the scroll-cue's
      bottom offset is measured against the viewport rather than against the
@@ -76,17 +130,30 @@
     font-weight: 800;
     letter-spacing: -0.03em;
     line-height: 1;
+    white-space: nowrap;
   }
   .giant-sub {
     font-size: clamp(1.5rem, 2.6vw, 2.1rem);
     font-weight: 500;
     letter-spacing: 0.02em;
     color: var(--ink-dim);
-    max-width: 28ch;
     line-height: 1.5;
     margin-top: 8px;
   }
-  .giant-sub .a-accent { color: var(--accent); font-weight: 600; }
+  .a-accent { color: var(--accent); }
+  .giant-sub .a-accent { font-weight: 600; }
+  /* Hard line breaks, each set nowrap: scrambled glyphs are not the same
+     width as the real ones, so free-flowing text would re-wrap on every
+     frame. Fixed lines can only overflow symmetrically, which is invisible
+     on centred text. */
+  .sub-line { display: block; white-space: nowrap; }
+
+  /* ---- Decrypt text effect ---- */
+  .dt-ch { opacity: 1; transition: opacity 0.18s linear; }
+  .dt-ch.is-enc { opacity: 0.42; }
+  @media (prefers-reduced-motion: reduce) {
+    .dt-ch, .dt-ch.is-enc { opacity: 1; transition: none; }
+  }
 
   .scroll-cue {
     position: absolute;
@@ -157,7 +224,10 @@
   }
   @media (max-width: 720px) {
     .hero-terrain { height: 220px; }
-    .scroll-cue { bottom: 24px; }
+    /* Larger than it looks: --nav-h is a rounded 60px here while the real
+       header is ~71px, so .hero-viewport overshoots the screen bottom by
+       ~11px. This keeps the arrows clear of a phone's bottom browser bar. */
+    .scroll-cue { bottom: 40px; }
     .scroll-cue::before { width: 112px; height: 76px; }
     /* The links are non-functional placeholders in this mockup and there
        isn't room for them beside the wordmark — drop them rather than let
@@ -215,43 +285,248 @@
     will-change: transform;
   }
 
+  /* Spec sheet: label and value share a baseline on one row, so it reads as
+     a datasheet rather than a stack of captions. */
   .product-specs {
     position: absolute;
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 22px;
+    width: min(340px, 32%);
     opacity: 0;
     transition: opacity 0.6s ease;
     pointer-events: none;
   }
-  .spec-row { display: flex; flex-direction: column; gap: 3px; }
-  .spec-k {
+  .spec-title {
+    display: block;
     font-family: var(--mono);
-    font-size: 11px;
-    letter-spacing: 0.08em;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--ink-faint);
+    padding-bottom: 11px;
+    border-bottom: 1px solid var(--line-strong);
   }
-  .spec-v { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.01em; }
+  .spec-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .spec-k {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    white-space: nowrap;
+  }
+  .spec-v {
+    font-size: 1.06rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-align: right;
+    white-space: nowrap;
+  }
 
   /* ---- Problem/solution section ---- */
   .problem-section {
     padding: 160px 0;
   }
-  .problem-section .eyebrow { display: block; margin-bottom: 24px; }
+  .problem-section .eyebrow { display: block; margin-bottom: 22px; }
+  .problem-heading {
+    font-size: clamp(1.9rem, 4vw, 3.1rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+    margin: 0 0 32px;
+  }
+  .problem-heading .dt-line { display: block; white-space: nowrap; }
+  .problem-heading .dt-line + .dt-line { color: var(--ink-dim); }
   .problem-text {
-    font-size: clamp(1.3rem, 2.4vw, 1.8rem);
-    line-height: 1.55;
-    max-width: 42ch;
+    font-size: clamp(1.1rem, 1.9vw, 1.4rem);
+    line-height: 1.62;
+    max-width: 54ch;
     color: var(--ink-dim);
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.9s cubic-bezier(.16,1,.3,1), transform 0.9s cubic-bezier(.16,1,.3,1);
   }
   .problem-text.is-visible { opacity: 1; transform: translateY(0); }
+
+  /* ---- Shared section furniture ---- */
+  /* A short accent rule turns the eyebrow into a system rather than the
+     red appearing twice on the page by coincidence. */
+  .eyebrow::before {
+    content: "";
+    display: inline-block;
+    width: 18px;
+    height: 1px;
+    margin-right: 11px;
+    vertical-align: middle;
+    background: var(--accent);
+  }
+  .section-heading {
+    font-size: clamp(1.9rem, 4vw, 3.1rem);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.12;
+    margin: 22px 0 20px;
+  }
+  .section-lead {
+    font-size: clamp(1rem, 1.5vw, 1.15rem);
+    line-height: 1.65;
+    color: var(--ink-dim);
+    max-width: 54ch;
+    margin: 0 0 52px;
+  }
+
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.8s cubic-bezier(.16,1,.3,1), transform 0.8s cubic-bezier(.16,1,.3,1);
+  }
+  [data-reveal].is-in { opacity: 1; transform: translateY(0); }
+
+  /* ---- Doctrine ---- */
+  .doctrine-section, .contact-section { padding: 140px 0; }
+  .domain-list { border-top: 1px solid var(--line); }
+  .domain-row {
+    display: grid;
+    grid-template-columns: 22px 1fr auto;
+    align-items: baseline;
+    gap: 18px;
+    padding: 20px 4px;
+    border-bottom: 1px solid var(--line);
+    transition: background 0.25s ease, padding-left 0.25s ease,
+                opacity 0.8s cubic-bezier(.16,1,.3,1), transform 0.8s cubic-bezier(.16,1,.3,1);
+  }
+  .domain-row:hover { background: rgba(26, 26, 24, 0.025); padding-left: 12px; }
+  .domain-mark {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    border: 1px solid var(--ink-faint);
+    align-self: center;
+  }
+  .domain-row.is-active .domain-mark {
+    background: var(--accent);
+    border-color: var(--accent);
+    animation: status-pulse 2.8s ease-in-out infinite;
+  }
+  .domain-name { font-size: clamp(1.2rem, 2.2vw, 1.6rem); font-weight: 700; letter-spacing: -0.015em; }
+  .domain-status {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .domain-row.is-active .domain-status { color: var(--accent); }
+
+  /* ---- Contact ---- */
+  .contact-fields { display: flex; flex-wrap: wrap; gap: 28px 72px; margin-bottom: 52px; }
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field-k {
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .field-v {
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.22s ease, color 0.22s ease;
+  }
+  a.field-v:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 26px;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-size: 0.95rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-decoration: none;
+    transition: transform 0.22s cubic-bezier(.16,1,.3,1), box-shadow 0.22s ease,
+                opacity 0.8s cubic-bezier(.16,1,.3,1);
+  }
+  .cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(140, 35, 35, 0.22);
+  }
+  .cta:active { transform: translateY(0); }
+  .cta-arrow { transition: transform 0.22s cubic-bezier(.16,1,.3,1); }
+  .cta:hover .cta-arrow { transform: translateX(4px); }
+
+  /* ---- Footer ---- */
+  .site-footer { border-top: 1px solid var(--line); padding: 34px 0 44px; }
+  .footer-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px 32px;
+  }
+  .footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .footer-brand .logo-mark { width: 15px; height: 15px; }
+  .footer-links { display: flex; gap: 26px; }
+  .footer-links a {
+    font-size: 13px;
+    color: var(--ink-dim);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+  .footer-links a:hover { color: var(--accent); }
+  .footer-copy {
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    color: var(--ink-faint);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal] { opacity: 1; transform: none; transition: none; }
+    .nav-dot, .domain-row.is-active .domain-mark { animation: none; }
+  }
+
+  @media (max-width: 900px) {
+    .nav-status { display: none; }
+  }
+
+  @media (max-width: 720px) {
+    /* Stack the sheet under the aircraft — there is no room beside it, and
+       the horizontal slide is disabled at this width anyway. */
+    .product-specs {
+      position: static;
+      transform: none;
+      width: 100%;
+      margin-top: 28px;
+    }
+    .problem-heading .dt-line { white-space: normal; }
+    .sub-line { white-space: normal; }
+    .doctrine-section, .contact-section { padding: 96px 0; }
+    .contact-fields { gap: 24px 40px; }
+    .footer-inner { flex-direction: column; align-items: flex-start; }
+  }
 </style>
 </head>
 <body>
@@ -261,13 +536,25 @@
 <header class="exp-header">
   <div class="wrap">
     <div class="exp-nav">
-      <a href="#" class="logo">
+      <a href="#top" class="logo">
         <img src="assets/logo-mark.png" class="logo-mark" alt="" />
         STRID
       </a>
-      <div class="exp-nav-links"><span>Thesis</span><span>Product</span><span>Mission</span><span>Contact</span></div>
+      <div class="exp-nav-right">
+        <nav class="exp-nav-links">
+          <a href="#product">Product</a>
+          <a href="#thesis">Thesis</a>
+          <a href="#doctrine">Doctrine</a>
+          <a href="#contact">Contact</a>
+        </nav>
+        <span class="nav-status">
+          <span class="nav-dot" aria-hidden="true"></span>
+          OSLO <span id="osloClock">--:--:--</span>
+        </span>
+      </div>
     </div>
   </div>
+  <span class="scroll-progress" id="scrollProgress" aria-hidden="true"></span>
 </header>
 
 <section class="hero-frame">
@@ -281,7 +568,7 @@
           <img src="assets/logo-mark.png" class="logo-mark" alt="" />
           <h1>STRID</h1>
         </div>
-        <p class="giant-sub">Advancing the <span class="a-accent">frontline</span> for allied forces.</p>
+        <p class="giant-sub"><span class="sub-line">Advancing the <span class="a-accent">frontline</span></span><span class="sub-line">for allied forces.</span></p>
       </div>
     </div>
     <div class="scroll-cue" aria-hidden="true">
@@ -296,30 +583,294 @@
 <section class="product-pin" id="product">
   <div class="product-sticky">
     <div class="wrap product-stage">
-      <h2 class="product-heading">STRID One</h2>
+      <h2 class="product-heading">STRID <span class="a-accent">One</span></h2>
       <div class="product-visual">
         <img src="assets/strid-one-render.png" class="product-plane" alt="STRID One autonomous carrier render" />
       </div>
       <div class="product-specs">
-        <div class="spec-row"><span class="spec-k">Wingspan</span><span class="spec-v">3.5m</span></div>
+        <span class="spec-title">Specifications</span>
+        <div class="spec-row"><span class="spec-k">Wingspan</span><span class="spec-v">3.5 m</span></div>
         <div class="spec-row"><span class="spec-k">Propulsion</span><span class="spec-v">Electric</span></div>
-        <div class="spec-row"><span class="spec-k">Flight</span><span class="spec-v">VTOL</span></div>
+        <div class="spec-row"><span class="spec-k">Launch</span><span class="spec-v">VTOL</span></div>
+        <div class="spec-row"><span class="spec-k">Recovery</span><span class="spec-v">Autonomous RTB</span></div>
         <div class="spec-row"><span class="spec-k">Status</span><span class="spec-v">In development</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="problem-section">
+<section class="problem-section" id="thesis">
   <div class="wrap">
-    <span class="eyebrow">Why it matters</span>
-    <p class="problem-text">Placeholder copy — not final. Expendable drones got cheap, but that didn't change the war. What actually decides an engagement is getting the right capability to the objective, again and again, without paying full price every single time. STRID One is a first answer to that problem.</p>
+    <span class="eyebrow">The arithmetic</span>
+    <h2 class="problem-heading"><span class="dt-line">Small drones won the argument.</span><span class="dt-line">They didn't win the math.</span></h2>
+    <p class="problem-text">Expendable airframes got cheap. Getting capability to the objective did not. A one-way aircraft throws away its radio, its autonomy and its sensors along with the warhead — and you buy that stack again on the next sortie, and the one after that. STRID One is built to bring the expensive part home.</p>
   </div>
 </section>
+
+<section class="doctrine-section" id="doctrine">
+  <div class="wrap">
+    <span class="eyebrow">Doctrine</span>
+    <h2 class="section-heading" data-decrypt>One doctrine. Every domain.</h2>
+    <p class="section-lead" data-reveal>Expendable systems get cheaper every year. Getting them to the fight does not. Strid is built around a single idea — autonomous carriers that survive the mission — applied wherever attrition warfare goes next.</p>
+
+    <div class="domain-list">
+      <div class="domain-row is-active" data-reveal data-reveal-step="0">
+        <span class="domain-mark" aria-hidden="true"></span>
+        <span class="domain-name">Air</span>
+        <span class="domain-status">Active — STRID One</span>
+      </div>
+      <div class="domain-row" data-reveal data-reveal-step="1">
+        <span class="domain-mark" aria-hidden="true"></span>
+        <span class="domain-name">Land</span>
+        <span class="domain-status">Next</span>
+      </div>
+      <div class="domain-row" data-reveal data-reveal-step="2">
+        <span class="domain-mark" aria-hidden="true"></span>
+        <span class="domain-name">Sea</span>
+        <span class="domain-status">Next</span>
+      </div>
+      <div class="domain-row" data-reveal data-reveal-step="3">
+        <span class="domain-mark" aria-hidden="true"></span>
+        <span class="domain-name">Subsea</span>
+        <span class="domain-status">Future</span>
+      </div>
+      <div class="domain-row" data-reveal data-reveal-step="4">
+        <span class="domain-mark" aria-hidden="true"></span>
+        <span class="domain-name">Space</span>
+        <span class="domain-status">Future</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact-section" id="contact">
+  <div class="wrap">
+    <span class="eyebrow">Contact</span>
+    <h2 class="section-heading" data-decrypt>Let's talk.</h2>
+    <p class="section-lead" data-reveal>For investors, press, and allied defence procurement.</p>
+
+    <div class="contact-fields">
+      <div class="field" data-reveal data-reveal-step="0">
+        <span class="field-k">Email</span>
+        <a class="field-v" href="mailto:ops@strid.defense">ops@strid.defense</a>
+      </div>
+      <div class="field" data-reveal data-reveal-step="1">
+        <span class="field-k">Location</span>
+        <span class="field-v">Oslo, Norway</span>
+      </div>
+      <div class="field" data-reveal data-reveal-step="2">
+        <span class="field-k">Programme</span>
+        <span class="field-v">In development</span>
+      </div>
+    </div>
+
+    <a class="cta" href="mailto:ops@strid.defense" data-reveal data-reveal-step="3">
+      Request briefing <span class="cta-arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="wrap footer-inner">
+    <a href="#top" class="footer-brand">
+      <img src="assets/logo-mark.png" class="logo-mark" alt="" />
+      STRID
+    </a>
+    <nav class="footer-links">
+      <a href="#product">Product</a>
+      <a href="#thesis">Thesis</a>
+      <a href="#doctrine">Doctrine</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <span class="footer-copy">© 2026 Strid — Oslo, Norway</span>
+  </div>
+</footer>
 
 <script>
   (function () {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ==================================================================
+       Decrypt text effect.
+
+       This is a port of React Bits' <DecryptedText />. The page is a single
+       static file with no build step, so pulling in React + ReactDOM +
+       motion (plus a JSX transform) to scramble four headings would cost
+       ~200KB and a toolchain for one effect. Same behaviour, no runtime.
+
+       One deliberate change: the original reveals a character per tick, so
+       the scramble rate and the reveal rate are the same number. Short
+       strings like "STRID" therefore finish in five frames. Here the two are
+       separate — repaint stays fast and smooth, revealInterval controls
+       pacing — so a five-character word can still take a full second.
+       ================================================================== */
+
+    const UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'.split('');
+    const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
+
+    // Wrap every non-space character in its own span, keeping existing inline
+    // markup (the accent span) intact.
+    function splitChars(root) {
+      const slots = [];
+      (function walk(node) {
+        const kids = Array.prototype.slice.call(node.childNodes);
+        kids.forEach((child) => {
+          if (child.nodeType === 3) {
+            const text = child.nodeValue.replace(/\s+/g, ' ');
+            if (!text) { node.removeChild(child); return; }
+            const frag = document.createDocumentFragment();
+            for (let i = 0; i < text.length; i++) {
+              const ch = text.charAt(i);
+              if (ch === ' ') { frag.appendChild(document.createTextNode(' ')); continue; }
+              const span = document.createElement('span');
+              span.className = 'dt-ch';
+              span.textContent = ch;
+              frag.appendChild(span);
+              slots.push({ el: span, ch });
+            }
+            node.replaceChild(frag, child);
+          } else if (child.nodeType === 1) {
+            walk(child);
+          }
+        });
+      })(root);
+      return slots;
+    }
+
+    function computeOrder(len, direction) {
+      const order = [];
+      if (len <= 0) return order;
+      if (direction === 'end') {
+        for (let i = len - 1; i >= 0; i--) order.push(i);
+        return order;
+      }
+      if (direction === 'center') {
+        const middle = Math.floor(len / 2);
+        let offset = 0;
+        while (order.length < len) {
+          const idx = offset % 2 === 0 ? middle + offset / 2 : middle - Math.ceil(offset / 2);
+          if (idx >= 0 && idx < len) order.push(idx);
+          offset++;
+        }
+        return order.slice(0, len);
+      }
+      for (let i = 0; i < len; i++) order.push(i);
+      return order;
+    }
+
+    function setupDecrypt(el, config) {
+      if (!el) return null;
+      const opts = Object.assign({
+        speed: 40,
+        revealInterval: 1,
+        revealDirection: 'start',
+        characters: LETTERS,
+        lockWidth: false
+      }, config);
+
+      let releaseWidth = null;
+      const slots = splitChars(el);
+      const alphabet = opts.characters;
+      const order = computeOrder(slots.length, opts.revealDirection);
+      const revealed = new Set();
+      let pointer = 0;
+      let tick = 0;
+      let timer = null;
+      let started = false;
+
+      function paint() {
+        for (let i = 0; i < slots.length; i++) {
+          const slot = slots[i];
+          if (revealed.has(i)) continue;
+          slot.el.textContent = alphabet[(Math.random() * alphabet.length) | 0];
+        }
+      }
+
+      function scrambleAll() {
+        slots.forEach((slot) => slot.el.classList.add('is-enc'));
+        paint();
+      }
+
+      function finish() {
+        clearInterval(timer);
+        timer = null;
+        slots.forEach((slot) => {
+          slot.el.textContent = slot.ch;
+          slot.el.classList.remove('is-enc');
+        });
+        if (releaseWidth) releaseWidth();
+      }
+
+      function run() {
+        if (started) return;
+        started = true;
+        if (prefersReducedMotion || !slots.length) { finish(); return; }
+
+        // Scrambled glyphs are not the width of the real ones, so the wordmark
+        // would shove the logo around as it animates. Measure with the real
+        // text back in place at the moment we start — measuring at parse time
+        // reads the fallback font and an unresolved clamp(), which is wrong by
+        // more than 2x — then pin that width for the duration.
+        if (opts.lockWidth) {
+          slots.forEach((slot) => { slot.el.textContent = slot.ch; });
+          const w = el.getBoundingClientRect().width;
+          el.style.width = w + 'px';
+          el.style.flexShrink = '0';
+          releaseWidth = () => { el.style.width = ''; el.style.flexShrink = ''; };
+          scrambleAll();
+        }
+
+        timer = setInterval(() => {
+          if (tick % opts.revealInterval === 0 && pointer < order.length) {
+            const idx = order[pointer++];
+            revealed.add(idx);
+            slots[idx].el.textContent = slots[idx].ch;
+            slots[idx].el.classList.remove('is-enc');
+          }
+          tick++;
+          if (revealed.size >= slots.length) { finish(); return; }
+          paint();
+        }, opts.speed);
+      }
+
+      if (!prefersReducedMotion) scrambleAll();
+
+      return { run, el };
+    }
+
+    // Gate the load-triggered runs on webfonts, so the width measurement above
+    // happens against the real face rather than the fallback.
+    const fontsReady = (document.fonts && document.fonts.ready)
+      ? document.fonts.ready
+      : Promise.resolve();
+
+    const targets = [
+      { sel: '.giant-wordmark h1', characters: UPPER, revealInterval: 7, speed: 38, lockWidth: true, on: 'load', delay: 220 },
+      { sel: '.giant-sub', characters: LETTERS, revealInterval: 1, speed: 34, on: 'load', delay: 620 },
+      { sel: '.product-heading', characters: LETTERS, revealInterval: 4, speed: 38, on: 'view' },
+      { sel: '.problem-heading', characters: LETTERS, revealInterval: 1, speed: 30, on: 'view' },
+      { sel: '.doctrine-section .section-heading', characters: LETTERS, revealInterval: 2, speed: 32, on: 'view' },
+      { sel: '.contact-section .section-heading', characters: LETTERS, revealInterval: 4, speed: 36, on: 'view' }
+    ];
+
+    targets.forEach((cfg) => {
+      const el = document.querySelector(cfg.sel);
+      const instance = setupDecrypt(el, cfg);
+      if (!instance) return;
+
+      if (cfg.on === 'load') {
+        fontsReady.then(() => setTimeout(instance.run, prefersReducedMotion ? 0 : (cfg.delay || 0)));
+      } else {
+        const io = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            instance.run();
+            io.unobserve(entry.target);
+          });
+        }, { threshold: 0.2 });
+        io.observe(el);
+      }
+    });
 
     // --- Product entrance: heading fades in, then the plane shortly after ---
     const productPin = document.querySelector('.product-pin');
@@ -349,8 +900,10 @@
       const progress = Math.min(Math.max(scrolled / scrollableDistance, 0), 1);
 
       // Plane slide happens across the 15%-65% range of the pin scroll.
+      // Below 720px the spec sheet stacks under the aircraft instead of
+      // sitting beside it, so there is nothing to slide out of the way.
       const slideProgress = Math.min(Math.max((progress - 0.15) / 0.5, 0), 1);
-      const slideDistance = Math.min(280, window.innerWidth * 0.22);
+      const slideDistance = window.innerWidth <= 720 ? 0 : Math.min(280, window.innerWidth * 0.22);
       plane.style.transform = prefersReducedMotion ? '' : `translateX(${slideProgress * slideDistance}px)`;
 
       // Specs reveal once the slide is mostly done, staying visible through
@@ -376,6 +929,61 @@
       });
     }, { threshold: 0.3 });
     problemObserver.observe(problemText);
+
+    // --- Generic staggered reveals ---
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        const step = parseInt(entry.target.getAttribute('data-reveal-step') || '0', 10);
+        entry.target.style.transitionDelay = prefersReducedMotion ? '0ms' : (step * 80) + 'ms';
+        entry.target.classList.add('is-in');
+        revealObserver.unobserve(entry.target);
+      });
+    }, { threshold: 0.2 });
+    document.querySelectorAll('[data-reveal]').forEach((el) => revealObserver.observe(el));
+
+    // --- Scroll progress + terrain parallax ---
+    const progressBar = document.getElementById('scrollProgress');
+    const terrain = document.querySelector('.hero-terrain');
+    let ambientTicking = false;
+
+    function updateAmbient() {
+      ambientTicking = false;
+      const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+      const y = window.scrollY;
+
+      if (progressBar) {
+        progressBar.style.transform = 'scaleX(' + (scrollable > 0 ? Math.min(y / scrollable, 1) : 0) + ')';
+      }
+
+      // Lags the page slightly so the ridge sits behind the type rather than
+      // on the same plane. Zero at the top, so the tuned hero position is
+      // exactly what it was.
+      if (terrain && !prefersReducedMotion) {
+        terrain.style.transform = 'translateY(' + (Math.min(y, 1000) * 0.14) + 'px)';
+      }
+    }
+    window.addEventListener('scroll', () => {
+      if (!ambientTicking) {
+        ambientTicking = true;
+        requestAnimationFrame(updateAmbient);
+      }
+    }, { passive: true });
+    updateAmbient();
+
+    // --- Oslo clock ---
+    const clock = document.getElementById('osloClock');
+    function tickClock() {
+      try {
+        clock.textContent = new Intl.DateTimeFormat('en-GB', {
+          timeZone: 'Europe/Oslo', hour: '2-digit', minute: '2-digit',
+          second: '2-digit', hour12: false
+        }).format(new Date());
+      } catch (err) {
+        clock.textContent = new Date().toTimeString().slice(0, 8);
+      }
+    }
+    if (clock) { tickClock(); setInterval(tickClock, 1000); }
   })();
 </script>
 
