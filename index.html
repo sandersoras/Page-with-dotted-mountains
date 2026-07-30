@@ -65,7 +65,7 @@
   }
 
   /* Sticky header would otherwise sit on top of anchor targets. */
-  #product, #thesis, #doctrine, #contact { scroll-margin-top: 96px; }
+  #product, #approach, #roadmap, #contact { scroll-margin-top: 96px; }
 
   /* Ends exactly at the bottom of the visible screen, so the scroll-cue's
      bottom offset is measured against the viewport rather than against the
@@ -402,7 +402,7 @@
   [data-reveal].is-in { opacity: 1; transform: translateY(0); }
 
   /* ---- Doctrine ---- */
-  .doctrine-section, .contact-section { padding: 140px 0; }
+  .roadmap-section, .contact-section { padding: 140px 0; }
   .domain-list { border-top: 1px solid var(--line); }
   .domain-row {
     display: grid;
@@ -529,7 +529,7 @@
     }
     .problem-heading .dt-line { white-space: normal; }
     .sub-line { white-space: normal; }
-    .doctrine-section, .contact-section { padding: 96px 0; }
+    .roadmap-section, .contact-section { padding: 96px 0; }
     .contact-fields { gap: 24px 40px; }
     .footer-inner { flex-direction: column; align-items: flex-start; }
   }
@@ -543,13 +543,13 @@
   <div class="wrap">
     <div class="exp-nav">
       <a href="#top" class="logo">
-        <img src="assets/logo-mark.png" class="logo-mark" alt="" />
+        <img src="assets/logo-mark-hires.png" class="logo-mark" alt="" />
         STRID
       </a>
       <nav class="exp-nav-links">
         <a href="#product">Product</a>
-        <a href="#thesis">Thesis</a>
-        <a href="#doctrine">Doctrine</a>
+        <a href="#approach">Approach</a>
+        <a href="#roadmap">Roadmap</a>
         <a href="#contact">Contact</a>
       </nav>
     </div>
@@ -565,7 +565,7 @@
     <div class="wrap">
       <div class="giant-hero">
         <div class="giant-wordmark">
-          <img src="assets/logo-mark.png" class="logo-mark" alt="" />
+          <img src="assets/logo-mark-hires.png" class="logo-mark" alt="" />
           <h1>STRID</h1>
         </div>
         <p class="giant-sub"><span class="sub-line">Advancing the <span class="a-accent">frontline</span></span><span class="sub-line">for allied forces.</span></p>
@@ -585,31 +585,31 @@
     <div class="wrap product-stage">
       <h2 class="product-heading">STRID <span class="a-accent">One</span></h2>
       <div class="product-visual">
-        <img src="assets/strid-one-render.png" class="product-plane" alt="STRID One autonomous carrier render" />
+        <img src="assets/strid-one-render-keyed.png" class="product-plane" alt="STRID One autonomous carrier render" />
       </div>
       <div class="product-specs">
         <span class="spec-title">Specifications</span>
+        <div class="spec-row"><span class="spec-k">Range</span><span class="spec-v">100 km out, 100 km home</span></div>
         <div class="spec-row"><span class="spec-k">Wingspan</span><span class="spec-v">3.5 m</span></div>
         <div class="spec-row"><span class="spec-k">Propulsion</span><span class="spec-v">Electric</span></div>
         <div class="spec-row"><span class="spec-k">Launch</span><span class="spec-v">VTOL</span></div>
-        <div class="spec-row"><span class="spec-k">Recovery</span><span class="spec-v">Autonomous RTB</span></div>
         <div class="spec-row"><span class="spec-k">Status</span><span class="spec-v">In development</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<section class="problem-section" id="thesis">
+<section class="problem-section" id="approach">
   <div class="wrap">
-    <span class="eyebrow">The arithmetic</span>
+    <span class="eyebrow">Approach</span>
     <h2 class="problem-heading"><span class="dt-line">Small drones won the argument.</span><span class="dt-line">They didn't win the math.</span></h2>
     <p class="problem-text">Expendable airframes got cheap. Getting capability to the objective did not. A one-way aircraft throws away its radio, its autonomy and its sensors along with the warhead — and you buy that stack again on the next sortie, and the one after that. STRID One is built to bring the expensive part home.</p>
   </div>
 </section>
 
-<section class="doctrine-section" id="doctrine">
+<section class="roadmap-section" id="roadmap">
   <div class="wrap">
-    <span class="eyebrow">Doctrine</span>
+    <span class="eyebrow">Roadmap</span>
     <h2 class="section-heading" data-decrypt>One doctrine. Every domain.</h2>
     <p class="section-lead" data-reveal>Expendable systems get cheaper every year. Getting them to the fight does not. Strid is built around a single idea — autonomous carriers that survive the mission — applied wherever attrition warfare goes next.</p>
 
@@ -665,7 +665,7 @@
     </div>
 
     <a class="cta" href="mailto:sander@strid.so" data-reveal data-reveal-step="3">
-      Request briefing <span class="cta-arrow" aria-hidden="true">→</span>
+      Get in touch <span class="cta-arrow" aria-hidden="true">→</span>
     </a>
   </div>
 </section>
@@ -673,13 +673,13 @@
 <footer class="site-footer">
   <div class="wrap footer-inner">
     <a href="#top" class="footer-brand">
-      <img src="assets/logo-mark.png" class="logo-mark" alt="" />
+      <img src="assets/logo-mark-hires.png" class="logo-mark" alt="" />
       STRID
     </a>
     <nav class="footer-links">
       <a href="#product">Product</a>
-      <a href="#thesis">Thesis</a>
-      <a href="#doctrine">Doctrine</a>
+      <a href="#approach">Approach</a>
+      <a href="#roadmap">Roadmap</a>
       <a href="#contact">Contact</a>
     </nav>
     <span class="footer-copy">© 2026 Strid — Oslo, Norway</span>
@@ -854,7 +854,7 @@
       { sel: '.giant-sub', characters: LETTERS, revealInterval: 1, speed: 34, on: 'load', delay: 620 },
       { sel: '.product-heading', characters: LETTERS, revealInterval: 4, speed: 38, on: 'view' },
       { sel: '.problem-heading', characters: LETTERS, revealInterval: 1, speed: 30, on: 'view' },
-      { sel: '.doctrine-section .section-heading', characters: LETTERS, revealInterval: 2, speed: 32, on: 'view' },
+      { sel: '.roadmap-section .section-heading', characters: LETTERS, revealInterval: 2, speed: 32, on: 'view' },
       { sel: '.contact-section .section-heading', characters: LETTERS, revealInterval: 4, speed: 36, on: 'view' }
     ];
 
