@@ -176,6 +176,9 @@
     align-items: center;
     gap: 1px;
     animation: scroll-cue-bob 2.2s ease-in-out infinite;
+    /* Own layer: without this the radial gradient sitting behind the arrows is
+       repainted on every frame of the bob. */
+    will-change: transform;
   }
   .scroll-cue-chevrons svg { width: 24px; height: 16px; color: var(--ink-dim); }
   .scroll-cue-chevrons svg:last-child { opacity: 0.4; margin-top: -4px; }
@@ -194,6 +197,9 @@
     overflow: hidden;
     pointer-events: none;
     z-index: 0;
+    /* Promotes the ridge to its own layer so the scroll parallax moves an
+       existing texture instead of repainting the image every frame. */
+    will-change: transform;
   }
   .hero-terrain img {
     width: 100%;
@@ -729,34 +735,34 @@
 
 <section class="problem-section" id="approach">
   <div class="wrap">
-    <span class="eyebrow">Approach</span>
+    <span class="eyebrow" data-reveal>Approach</span>
     <h2 class="problem-heading"><span class="dt-line">Why Current FPV</span><span class="dt-line">Operations Don't Scale</span></h2>
 
     <div class="argument">
       <ol class="point-list">
-        <li class="point" data-reveal data-reveal-step="0">
+        <li class="point" data-reveal>
           <span class="point-num">01</span>
           <p class="point-text">In Ukraine, the grey zone widens every month. Targets sit further back.</p>
         </li>
-        <li class="point" data-reveal data-reveal-step="1">
+        <li class="point" data-reveal>
           <span class="point-num">02</span>
           <p class="point-text">FPVs get bigger to reach them.</p>
         </li>
-        <li class="point" data-reveal data-reveal-step="2">
+        <li class="point" data-reveal>
           <span class="point-num">03</span>
           <p class="point-text">The extra mass is battery, not warhead.</p>
         </li>
       </ol>
       <div class="metric-group">
-        <span class="metric" data-reveal data-reveal-step="0">
+        <span class="metric" data-reveal>
           <span class="metric-k">Range needed</span>
           <span class="metric-icon dir-up tone-bad"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19.5V6"/><path d="M5.5 12.5L12 6L18.5 12.5"/></svg></span>
         </span>
-        <span class="metric" data-reveal data-reveal-step="1">
+        <span class="metric" data-reveal>
           <span class="metric-k">Drone size</span>
           <span class="metric-icon dir-up tone-bad"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19.5V6"/><path d="M5.5 12.5L12 6L18.5 12.5"/></svg></span>
         </span>
-        <span class="metric" data-reveal data-reveal-step="2">
+        <span class="metric" data-reveal>
           <span class="metric-k">Cost per strike</span>
           <span class="metric-icon dir-up tone-bad"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19.5V6"/><path d="M5.5 12.5L12 6L18.5 12.5"/></svg></span>
         </span>
@@ -767,29 +773,29 @@
 
     <div class="argument">
       <ol class="point-list">
-        <li class="point" data-reveal data-reveal-step="0">
+        <li class="point" data-reveal>
           <span class="point-num">01</span>
           <p class="point-text">STRID One launches from a forward operating base, not the trench.</p>
         </li>
-        <li class="point" data-reveal data-reveal-step="1">
+        <li class="point" data-reveal>
           <span class="point-num">02</span>
           <p class="point-text">It crosses autonomously, at altitude, through jamming.</p>
         </li>
-        <li class="point" data-reveal data-reveal-step="2">
+        <li class="point" data-reveal>
           <span class="point-num">03</span>
           <p class="point-text">It drops standard 7 and 8 inch FPVs, then flies home to fly again.</p>
         </li>
       </ol>
       <div class="metric-group">
-        <span class="metric" data-reveal data-reveal-step="0">
+        <span class="metric" data-reveal>
           <span class="metric-k">Operator exposure</span>
           <span class="metric-icon dir-down tone-good"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19.5V6"/><path d="M5.5 12.5L12 6L18.5 12.5"/></svg></span>
         </span>
-        <span class="metric" data-reveal data-reveal-step="1">
+        <span class="metric" data-reveal>
           <span class="metric-k">Effective range</span>
           <span class="metric-icon dir-up tone-good"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19.5V6"/><path d="M5.5 12.5L12 6L18.5 12.5"/></svg></span>
         </span>
-        <span class="metric" data-reveal data-reveal-step="2">
+        <span class="metric" data-reveal>
           <span class="metric-k">Cost per strike</span>
           <span class="metric-icon dir-down tone-good"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19.5V6"/><path d="M5.5 12.5L12 6L18.5 12.5"/></svg></span>
         </span>
@@ -800,32 +806,32 @@
 
 <section class="roadmap-section" id="roadmap">
   <div class="wrap">
-    <span class="eyebrow">Roadmap</span>
+    <span class="eyebrow" data-reveal>Roadmap</span>
     <h2 class="section-heading" data-decrypt>Air first. Not air only.</h2>
     <p class="section-lead" data-reveal>The carrier is the product, not the airframe. The same pattern holds on land, at sea and below it.</p>
 
     <div class="domain-list">
-      <div class="domain-row is-active" data-reveal data-reveal-step="0">
+      <div class="domain-row is-active" data-reveal>
         <span class="domain-mark" aria-hidden="true"></span>
         <span class="domain-name">Air</span>
         <span class="domain-status">Active</span>
       </div>
-      <div class="domain-row" data-reveal data-reveal-step="1">
+      <div class="domain-row" data-reveal>
         <span class="domain-mark" aria-hidden="true"></span>
         <span class="domain-name">Land</span>
         <span class="domain-status">Next</span>
       </div>
-      <div class="domain-row" data-reveal data-reveal-step="2">
+      <div class="domain-row" data-reveal>
         <span class="domain-mark" aria-hidden="true"></span>
         <span class="domain-name">Sea</span>
         <span class="domain-status">Next</span>
       </div>
-      <div class="domain-row" data-reveal data-reveal-step="3">
+      <div class="domain-row" data-reveal>
         <span class="domain-mark" aria-hidden="true"></span>
         <span class="domain-name">Subsea</span>
         <span class="domain-status">Future</span>
       </div>
-      <div class="domain-row" data-reveal data-reveal-step="4">
+      <div class="domain-row" data-reveal>
         <span class="domain-mark" aria-hidden="true"></span>
         <span class="domain-name">Space</span>
         <span class="domain-status">Future</span>
@@ -836,26 +842,26 @@
 
 <section class="contact-section" id="contact">
   <div class="wrap">
-    <span class="eyebrow">Contact</span>
+    <span class="eyebrow" data-reveal>Contact</span>
     <h2 class="section-heading" data-decrypt>Let's talk.</h2>
     <p class="section-lead" data-reveal>For investors, press, and allied defence procurement.</p>
 
     <div class="contact-fields">
-      <div class="field" data-reveal data-reveal-step="0">
+      <div class="field" data-reveal>
         <span class="field-k">Chief executive</span>
         <a class="field-v" href="mailto:sander@strid.so">sander@strid.so</a>
       </div>
-      <div class="field" data-reveal data-reveal-step="1">
+      <div class="field" data-reveal>
         <span class="field-k">Chief technology</span>
         <a class="field-v" href="mailto:viktor@strid.so">viktor@strid.so</a>
       </div>
-      <div class="field" data-reveal data-reveal-step="2">
+      <div class="field" data-reveal>
         <span class="field-k">Location</span>
         <span class="field-v">Oslo, Norway</span>
       </div>
     </div>
 
-    <a class="cta" href="mailto:sander@strid.so" data-reveal data-reveal-step="3">
+    <a class="cta" href="mailto:sander@strid.so" data-reveal>
       Get in touch <span class="cta-arrow" aria-hidden="true">→</span>
     </a>
   </div>
@@ -863,17 +869,17 @@
 
 <footer class="site-footer">
   <div class="wrap footer-inner">
-    <a href="#top" class="footer-brand">
+    <a href="#top" class="footer-brand" data-reveal>
       <img src="assets/logo-mark.png" class="logo-mark" alt="" />
       STRID
     </a>
-    <nav class="footer-links">
+    <nav class="footer-links" data-reveal>
       <a href="#product">Product</a>
       <a href="#approach">Approach</a>
       <a href="#roadmap">Roadmap</a>
       <a href="#contact">Contact</a>
     </nav>
-    <span class="footer-copy">© 2026 Strid, Oslo, Norway</span>
+    <span class="footer-copy" data-reveal>© 2026 Strid, Oslo, Norway</span>
   </div>
 </footer>
 
@@ -884,6 +890,12 @@
     // judged on the motion, and accessibility complaints will be handled as
     // they come in rather than pre-emptively.
     const mobileQuery = window.matchMedia('(max-width: 720px)');
+
+    // Land at the top on reload. Browsers restore the previous scroll position
+    // by default, which drops you into the middle of a page whose entrance
+    // animations have all already fired.
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    window.addEventListener('load', () => window.scrollTo(0, 0));
 
     /* ==================================================================
        Decrypt text effect.
@@ -921,7 +933,10 @@
               span.className = 'dt-ch';
               span.textContent = ch;
               frag.appendChild(span);
-              slots.push({ el: span, ch });
+              // Keep the text node itself: writing nodeValue on every frame is
+              // markedly cheaper than textContent, which tears down and rebuilds
+              // the node each time.
+              slots.push({ el: span, node: span.firstChild, ch });
             }
             node.replaceChild(frag, child);
           } else if (child.nodeType === 1) {
@@ -968,16 +983,16 @@
       const alphabet = opts.characters;
       const order = computeOrder(slots.length, opts.revealDirection);
       const revealed = new Set();
+      const alphabetLen = alphabet.length;
       let pointer = 0;
       let tick = 0;
-      let timer = null;
+      let rafId = null;
       let started = false;
 
       function paint() {
         for (let i = 0; i < slots.length; i++) {
-          const slot = slots[i];
           if (revealed.has(i)) continue;
-          slot.el.textContent = alphabet[(Math.random() * alphabet.length) | 0];
+          slots[i].node.nodeValue = alphabet[(Math.random() * alphabetLen) | 0];
         }
       }
 
@@ -987,10 +1002,9 @@
       }
 
       function finish() {
-        clearInterval(timer);
-        timer = null;
+        if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
         slots.forEach((slot) => {
-          slot.el.textContent = slot.ch;
+          slot.node.nodeValue = slot.ch;
           slot.el.classList.remove('is-enc');
         });
         if (releaseWidth) releaseWidth();
@@ -1007,7 +1021,7 @@
         // reads the fallback font and an unresolved clamp(), which is wrong by
         // more than 2x — then pin that width for the duration.
         if (opts.lockWidth) {
-          slots.forEach((slot) => { slot.el.textContent = slot.ch; });
+          slots.forEach((slot) => { slot.node.nodeValue = slot.ch; });
           const w = el.getBoundingClientRect().width;
           el.style.width = w + 'px';
           el.style.flexShrink = '0';
@@ -1015,17 +1029,28 @@
           scrambleAll();
         }
 
-        timer = setInterval(() => {
-          if (tick % opts.revealInterval === 0 && pointer < order.length) {
-            const idx = order[pointer++];
-            revealed.add(idx);
-            slots[idx].el.textContent = slots[idx].ch;
-            slots[idx].el.classList.remove('is-enc');
+        // Driven by rAF rather than setInterval. setInterval keeps firing at a
+        // fixed rate whether or not the device managed to paint the last frame,
+        // so on a phone the work piles up and the whole page stutters. Ticking
+        // off the frame clock means a struggling device simply does fewer
+        // scramble steps instead of falling further behind.
+        let lastTick = 0;
+        function step(now) {
+          if (now - lastTick >= opts.speed) {
+            lastTick = now;
+            if (tick % opts.revealInterval === 0 && pointer < order.length) {
+              const idx = order[pointer++];
+              revealed.add(idx);
+              slots[idx].node.nodeValue = slots[idx].ch;
+              slots[idx].el.classList.remove('is-enc');
+            }
+            tick++;
+            if (revealed.size >= slots.length) { finish(); return; }
+            paint();
           }
-          tick++;
-          if (revealed.size >= slots.length) { finish(); return; }
-          paint();
-        }, opts.speed);
+          rafId = requestAnimationFrame(step);
+        }
+        rafId = requestAnimationFrame(step);
       }
 
       scrambleAll();
@@ -1140,17 +1165,31 @@
     }, { passive: true });
     updateProductScroll();
 
-    // --- Generic staggered reveals ---
+    // --- Section reveals ---
+    // One observer per section, not per element. Arriving at a section brings
+    // its whole body in on a single staggered cascade, so the reader gets a
+    // finished block to read instead of paragraphs and rows popping in one at
+    // a time as they keep scrolling. Only the headings hold back for their own
+    // decrypt. Watching 6 sections instead of 24 elements is also markedly
+    // less work for the phone.
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
-        const step = parseInt(entry.target.getAttribute('data-reveal-step') || '0', 10);
-        entry.target.style.transitionDelay = (step * 80) + 'ms';
-        entry.target.classList.add('is-in');
+        entry.target.querySelectorAll('[data-reveal]').forEach((el, i) => {
+          el.style.transitionDelay = (i * 85) + 'ms';
+          el.classList.add('is-in');
+        });
         revealObserver.unobserve(entry.target);
       });
-    }, { threshold: 0.2 });
-    document.querySelectorAll('[data-reveal]').forEach((el) => revealObserver.observe(el));
+    }, {
+      // Fires as the section's top passes the lower quarter of the screen,
+      // rather than the moment a single pixel of a tall section appears.
+      rootMargin: '0px 0px -22% 0px',
+      threshold: 0
+    });
+    document.querySelectorAll('section, footer').forEach((section) => {
+      if (section.querySelector('[data-reveal]')) revealObserver.observe(section);
+    });
 
     // --- Scroll progress + terrain parallax ---
     const progressBar = document.getElementById('scrollProgress');
@@ -1168,8 +1207,10 @@
 
       // Lags the page slightly so the ridge sits behind the type rather than
       // on the same plane. Zero at the top, so the tuned hero position is
-      // exactly what it was.
-      if (terrain) {
+      // exactly what it was. Skipped on phones: transforming a container that
+      // holds a 1717px image on every scroll frame is the most expensive thing
+      // on the page, and at 220px tall the effect is barely visible there.
+      if (terrain && !mobileQuery.matches) {
         terrain.style.transform = 'translateY(' + (Math.min(y, 1000) * 0.14) + 'px)';
       }
     }
