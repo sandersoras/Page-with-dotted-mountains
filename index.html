@@ -14,7 +14,10 @@
      so it sticks for the whole page. Because it now sits above .hero-frame
      in normal flow rather than inside it, every viewport-relative height
      below has to subtract its height to land where the approved mockup did. */
-  :root { --nav-h: 95px; }
+  /* --positive is a new brand colour, added because the solution metrics
+     need to read as favourable and the palette only had crimson. Muted and
+     dark enough to sit beside #8C2323 without turning into a success toast. */
+  :root { --nav-h: 95px; --positive: #3A6B45; }
 
   .exp-header {
     position: sticky;
@@ -355,17 +358,100 @@
     margin: 0 0 32px;
   }
   .problem-heading .dt-line { display: block; white-space: nowrap; }
-  .problem-heading .dt-line + .dt-line { color: var(--ink-dim); }
-  .problem-text {
-    font-size: clamp(1.1rem, 1.9vw, 1.4rem);
-    line-height: 1.62;
-    max-width: 54ch;
-    color: var(--ink-dim);
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.9s cubic-bezier(.16,1,.3,1), transform 0.9s cubic-bezier(.16,1,.3,1);
+
+  /* Numbered points. The numbering is real here: each block is an argument
+     that only works read in order, premise then consequence then result. */
+  /* Points on the left, metrics as one standalone group on the right. The
+     rules belong to the list, so they stop at the text column instead of
+     running under the metrics. */
+  .argument {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0 clamp(36px, 6vw, 88px);
+    align-items: center;
+    margin-top: 44px;
   }
-  .problem-text.is-visible { opacity: 1; transform: translateY(0); }
+  .point-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+  }
+  .point {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 20px;
+    align-items: start;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .point-num {
+    padding-top: 5px;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    color: var(--ink-faint);
+  }
+  .point-text {
+    margin: 0;
+    font-size: clamp(1.05rem, 1.7vw, 1.3rem);
+    line-height: 1.5;
+    color: var(--ink-dim);
+    max-width: 44ch;
+  }
+
+  .metric-group {
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .metric {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 15px;
+    white-space: nowrap;
+  }
+  .metric-k {
+    font-family: var(--mono);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .metric-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .metric-icon svg {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .metric-icon.dir-down svg { transform: rotate(180deg); }
+  /* Colour encodes whether the number moves for you or against you, not which
+     way the arrow points: effective range going up is good, drone size going
+     up is not. So the problem block is crimson throughout and the solution
+     block green throughout, whatever the direction. */
+  .metric-icon.tone-bad  { color: var(--accent);   background: rgba(140, 35, 35, 0.10); }
+  .metric-icon.tone-good { color: var(--positive); background: rgba(58, 107, 69, 0.12); }
+
+  .sub-heading {
+    margin: 68px 0 0;
+    font-size: clamp(1.15rem, 1.8vw, 1.45rem);
+    font-weight: 700;
+    letter-spacing: -0.015em;
+  }
 
   /* ---- Shared section furniture ---- */
   /* A short accent rule turns the eyebrow into a system rather than the
@@ -529,6 +615,49 @@
     }
     .problem-heading .dt-line { white-space: normal; }
     .sub-line { white-space: normal; }
+    /* Metrics drop below the whole list and sit as one row of three, rather
+       than each pairing with a point. */
+    .argument { grid-template-columns: 1fr; gap: 0; }
+    .point { grid-template-columns: 32px minmax(0, 1fr); gap: 14px; }
+    .metric-group {
+      flex-direction: row;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 30px;
+    }
+    .metric {
+      /* reverse so the icon leads and the label reads underneath it */
+      flex: 1 1 0;
+      flex-direction: column-reverse;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 11px;
+      white-space: normal;
+      text-align: center;
+    }
+    .metric-k { font-size: 9.5px; letter-spacing: 0.09em; }
+    .metric-icon { width: 40px; height: 40px; }
+    .metric-icon svg { width: 22px; height: 22px; }
+
+    /* Unpin the product section on phones. The sticky 100vh stage fought
+       iOS Safari's collapsing address bar, which is what made the render
+       jump, and 280vh of scroll bought almost no animation once the
+       horizontal slide was disabled at this width. */
+    .product-pin { height: auto; }
+    .product-sticky {
+      position: static;
+      height: auto;
+      overflow: visible;
+      display: block;
+      padding: 84px 0 96px;
+    }
+    .product-specs { opacity: 1; }
+    .spec-title, .spec-row {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.7s cubic-bezier(.16,1,.3,1), transform 0.7s cubic-bezier(.16,1,.3,1);
+    }
+    .spec-title.is-in, .spec-row.is-in { opacity: 1; transform: none; }
     .roadmap-section, .contact-section { padding: 96px 0; }
     .contact-fields { gap: 24px 40px; }
     .footer-inner { flex-direction: column; align-items: flex-start; }
@@ -602,22 +731,85 @@
 <section class="problem-section" id="approach">
   <div class="wrap">
     <span class="eyebrow">Approach</span>
-    <h2 class="problem-heading"><span class="dt-line">Small drones won the argument.</span><span class="dt-line">They didn't win the math.</span></h2>
-    <p class="problem-text">Expendable airframes got cheap. Getting capability to the objective did not. A one-way aircraft throws away its radio, its autonomy and its sensors along with the warhead — and you buy that stack again on the next sortie, and the one after that. STRID One is built to bring the expensive part home.</p>
+    <h2 class="problem-heading"><span class="dt-line">Why Current FPV</span><span class="dt-line">Operations Don't Scale</span></h2>
+
+    <div class="argument">
+      <ol class="point-list">
+        <li class="point" data-reveal data-reveal-step="0">
+          <span class="point-num">01</span>
+          <p class="point-text">In Ukraine, the grey zone widens every month. Targets sit further back.</p>
+        </li>
+        <li class="point" data-reveal data-reveal-step="1">
+          <span class="point-num">02</span>
+          <p class="point-text">FPVs get bigger to reach them.</p>
+        </li>
+        <li class="point" data-reveal data-reveal-step="2">
+          <span class="point-num">03</span>
+          <p class="point-text">The extra mass is battery, not warhead.</p>
+        </li>
+      </ol>
+      <div class="metric-group">
+        <span class="metric" data-reveal data-reveal-step="0">
+          <span class="metric-k">Range needed</span>
+          <span class="metric-icon dir-up tone-bad"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19.5V6"/><path d="M5.5 12.5L12 6L18.5 12.5"/></svg></span>
+        </span>
+        <span class="metric" data-reveal data-reveal-step="1">
+          <span class="metric-k">Drone size</span>
+          <span class="metric-icon dir-up tone-bad"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19.5V6"/><path d="M5.5 12.5L12 6L18.5 12.5"/></svg></span>
+        </span>
+        <span class="metric" data-reveal data-reveal-step="2">
+          <span class="metric-k">Cost per strike</span>
+          <span class="metric-icon dir-up tone-bad"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19.5V6"/><path d="M5.5 12.5L12 6L18.5 12.5"/></svg></span>
+        </span>
+      </div>
+    </div>
+
+    <h3 class="sub-heading" data-reveal>How we solve it</h3>
+
+    <div class="argument">
+      <ol class="point-list">
+        <li class="point" data-reveal data-reveal-step="0">
+          <span class="point-num">01</span>
+          <p class="point-text">STRID One launches from a forward operating base, not the trench.</p>
+        </li>
+        <li class="point" data-reveal data-reveal-step="1">
+          <span class="point-num">02</span>
+          <p class="point-text">It delivers standard 7 and 8 inch FPVs onto the objective with full energy.</p>
+        </li>
+        <li class="point" data-reveal data-reveal-step="2">
+          <span class="point-num">03</span>
+          <p class="point-text">Then it flies home and flies again.</p>
+        </li>
+      </ol>
+      <div class="metric-group">
+        <span class="metric" data-reveal data-reveal-step="0">
+          <span class="metric-k">Operator exposure</span>
+          <span class="metric-icon dir-down tone-good"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19.5V6"/><path d="M5.5 12.5L12 6L18.5 12.5"/></svg></span>
+        </span>
+        <span class="metric" data-reveal data-reveal-step="1">
+          <span class="metric-k">Effective range</span>
+          <span class="metric-icon dir-up tone-good"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19.5V6"/><path d="M5.5 12.5L12 6L18.5 12.5"/></svg></span>
+        </span>
+        <span class="metric" data-reveal data-reveal-step="2">
+          <span class="metric-k">Cost per strike</span>
+          <span class="metric-icon dir-down tone-good"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19.5V6"/><path d="M5.5 12.5L12 6L18.5 12.5"/></svg></span>
+        </span>
+      </div>
+    </div>
   </div>
 </section>
 
 <section class="roadmap-section" id="roadmap">
   <div class="wrap">
     <span class="eyebrow">Roadmap</span>
-    <h2 class="section-heading" data-decrypt>One doctrine. Every domain.</h2>
-    <p class="section-lead" data-reveal>Expendable systems get cheaper every year. Getting them to the fight does not. Strid is built around a single idea — autonomous carriers that survive the mission — applied wherever attrition warfare goes next.</p>
+    <h2 class="section-heading" data-decrypt>Air first. Not air only.</h2>
+    <p class="section-lead" data-reveal>The carrier is the product, not the airframe. The same pattern holds on land, at sea and below it.</p>
 
     <div class="domain-list">
       <div class="domain-row is-active" data-reveal data-reveal-step="0">
         <span class="domain-mark" aria-hidden="true"></span>
         <span class="domain-name">Air</span>
-        <span class="domain-status">Active — STRID One</span>
+        <span class="domain-status">Active</span>
       </div>
       <div class="domain-row" data-reveal data-reveal-step="1">
         <span class="domain-mark" aria-hidden="true"></span>
@@ -682,13 +874,19 @@
       <a href="#roadmap">Roadmap</a>
       <a href="#contact">Contact</a>
     </nav>
-    <span class="footer-copy">© 2026 Strid — Oslo, Norway</span>
+    <span class="footer-copy">© 2026 Strid, Oslo, Norway</span>
   </div>
 </footer>
 
 <script>
   (function () {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // ?forcemotion=1 overrides the OS setting. Diagnostic: if the headline
+    // animates with it and not without, the device has Reduce Motion on.
+    const forceMotion = /[?&]forcemotion=1/.test(window.location.search);
+    const prefersReducedMotion = !forceMotion &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const mobileQuery = window.matchMedia('(max-width: 720px)');
 
     /* ==================================================================
        Decrypt text effect.
@@ -898,6 +1096,8 @@
     let ticking = false;
     function updateProductScroll() {
       ticking = false;
+      // Not pinned below 720px, so there is no scroll progress to map.
+      if (mobileQuery.matches) return;
       const rect = productPin.getBoundingClientRect();
       const scrollableDistance = productPin.offsetHeight - window.innerHeight;
       if (scrollableDistance <= 0) return;
@@ -924,16 +1124,19 @@
     }, { passive: true });
     updateProductScroll();
 
-    // --- Problem section fade-in ---
-    const problemText = document.querySelector('.problem-text');
-    const problemObserver = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        problemText.classList.add('is-visible');
-        problemObserver.unobserve(entry.target);
-      });
-    }, { threshold: 0.3 });
-    problemObserver.observe(problemText);
+    // --- Spec sheet reveals row by row on phones ---
+    // The desktop sheet fades in as one block driven by pin progress; without
+    // a pin there is no progress to drive it, so each row earns its own entry.
+    if (mobileQuery.matches) {
+      const specIO = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-in');
+          specIO.unobserve(entry.target);
+        });
+      }, { threshold: 0.6 });
+      document.querySelectorAll('.spec-title, .spec-row').forEach((el) => specIO.observe(el));
+    }
 
     // --- Generic staggered reveals ---
     const revealObserver = new IntersectionObserver((entries) => {
