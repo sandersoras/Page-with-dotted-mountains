@@ -134,11 +134,10 @@
   .sub-line { display: block; white-space: nowrap; }
 
   /* ---- Decrypt text effect ---- */
+  /* No reduced-motion override here on purpose: the decrypt is the one
+     effect that runs for every visitor. See the note in the script. */
   .dt-ch { opacity: 1; transition: opacity 0.18s linear; }
   .dt-ch.is-enc { opacity: 0.42; }
-  @media (prefers-reduced-motion: reduce) {
-    .dt-ch, .dt-ch.is-enc { opacity: 1; transition: none; }
-  }
 
   .scroll-cue {
     position: absolute;
@@ -186,10 +185,6 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(5px); }
   }
-  @media (prefers-reduced-motion: reduce) {
-    .scroll-cue-chevrons { animation: none; }
-  }
-
   .hero-terrain {
     position: absolute;
     left: 0;
@@ -284,12 +279,17 @@
   }
   .product-heading.is-visible { opacity: 1; transform: translateY(0); }
 
+  /* Rises and settles rather than just fading. A bare opacity change on a
+     large image reads as a pop; the small travel gives the eye something to
+     follow so it arrives instead of appearing. */
   .product-visual {
     margin-top: 24px;
     opacity: 0;
-    transition: opacity 0.9s ease;
+    transform: translateY(26px) scale(0.985);
+    transition: opacity 1.1s cubic-bezier(.16,1,.3,1),
+                transform 1.1s cubic-bezier(.16,1,.3,1);
   }
-  .product-visual.is-visible { opacity: 1; }
+  .product-visual.is-visible { opacity: 1; transform: none; }
   .product-plane {
     display: block;
     max-width: 640px;
@@ -599,11 +599,6 @@
     color: var(--ink-faint);
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    [data-reveal] { opacity: 1; transform: none; transition: none; }
-    .domain-row.is-active .domain-mark { animation: none; }
-  }
-
   @media (max-width: 720px) {
     /* Stack the sheet under the aircraft — there is no room beside it, and
        the horizontal slide is disabled at this width anyway. */
@@ -639,18 +634,22 @@
     .metric-icon { width: 40px; height: 40px; }
     .metric-icon svg { width: 22px; height: 22px; }
 
-    /* Unpin the product section on phones. The sticky 100vh stage fought
-       iOS Safari's collapsing address bar, which is what made the render
-       jump, and 280vh of scroll bought almost no animation once the
-       horizontal slide was disabled at this width. */
-    .product-pin { height: auto; }
+    /* Pinned on phones so the page holds still while the spec rows count in.
+       Measured in svh, not vh: the earlier jumping was vh being recomputed as
+       iOS Safari's address bar collapses, which resized the sticky stage mid
+       scroll. svh is the small viewport and does not move. 200svh is short
+       enough that the hold never feels like dead scrolling. */
+    .product-pin { height: 200vh; }
+    .product-pin { height: 200svh; }
     .product-sticky {
-      position: static;
-      height: auto;
-      overflow: visible;
-      display: block;
-      padding: 84px 0 96px;
+      position: sticky;
+      top: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      height: 100vh;
     }
+    .product-sticky { height: 100svh; }
     .product-specs { opacity: 1; }
     .spec-title, .spec-row {
       opacity: 0;
@@ -672,7 +671,7 @@
   <div class="wrap">
     <div class="exp-nav">
       <a href="#top" class="logo">
-        <img src="assets/logo-mark-hires.png" class="logo-mark" alt="" />
+        <img src="assets/logo-mark.png" class="logo-mark" alt="" />
         STRID
       </a>
       <nav class="exp-nav-links">
@@ -688,13 +687,13 @@
 
 <section class="hero-frame">
   <div class="hero-terrain" aria-hidden="true">
-    <img src="assets/bakgrunn-transparent.png" alt="" />
+    <img src="assets/terrain.webp" alt="" />
   </div>
   <div class="hero-viewport">
     <div class="wrap">
       <div class="giant-hero">
         <div class="giant-wordmark">
-          <img src="assets/logo-mark-hires.png" class="logo-mark" alt="" />
+          <img src="assets/logo-mark.png" class="logo-mark" alt="" />
           <h1>STRID</h1>
         </div>
         <p class="giant-sub"><span class="sub-line">Advancing the <span class="a-accent">frontline</span></span><span class="sub-line">for allied forces.</span></p>
@@ -714,7 +713,7 @@
     <div class="wrap product-stage">
       <h2 class="product-heading">STRID <span class="a-accent">One</span></h2>
       <div class="product-visual">
-        <img src="assets/strid-one-render-keyed.png" class="product-plane" alt="STRID One autonomous carrier render" />
+        <img src="assets/strid-one.webp" class="product-plane" alt="STRID One autonomous carrier render" />
       </div>
       <div class="product-specs">
         <span class="spec-title">Specifications</span>
@@ -774,11 +773,11 @@
         </li>
         <li class="point" data-reveal data-reveal-step="1">
           <span class="point-num">02</span>
-          <p class="point-text">It delivers standard 7 and 8 inch FPVs onto the objective with full energy.</p>
+          <p class="point-text">It crosses autonomously, at altitude, through jamming.</p>
         </li>
         <li class="point" data-reveal data-reveal-step="2">
           <span class="point-num">03</span>
-          <p class="point-text">Then it flies home and flies again.</p>
+          <p class="point-text">It drops standard 7 and 8 inch FPVs, then flies home to fly again.</p>
         </li>
       </ol>
       <div class="metric-group">
@@ -865,7 +864,7 @@
 <footer class="site-footer">
   <div class="wrap footer-inner">
     <a href="#top" class="footer-brand">
-      <img src="assets/logo-mark-hires.png" class="logo-mark" alt="" />
+      <img src="assets/logo-mark.png" class="logo-mark" alt="" />
       STRID
     </a>
     <nav class="footer-links">
@@ -880,12 +879,10 @@
 
 <script>
   (function () {
-    // ?forcemotion=1 overrides the OS setting. Diagnostic: if the headline
-    // animates with it and not without, the device has Reduce Motion on.
-    const forceMotion = /[?&]forcemotion=1/.test(window.location.search);
-    const prefersReducedMotion = !forceMotion &&
-      window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
+    // Every animation on this page runs for every visitor, regardless of the
+    // device's Reduce Motion setting. Deliberate product decision: the site is
+    // judged on the motion, and accessibility complaints will be handled as
+    // they come in rather than pre-emptively.
     const mobileQuery = window.matchMedia('(max-width: 720px)');
 
     /* ==================================================================
@@ -1002,7 +999,7 @@
       function run() {
         if (started) return;
         started = true;
-        if (prefersReducedMotion || !slots.length) { finish(); return; }
+        if (!slots.length) { finish(); return; }
 
         // Scrambled glyphs are not the width of the real ones, so the wordmark
         // would shove the logo around as it animates. Measure with the real
@@ -1031,7 +1028,7 @@
         }, opts.speed);
       }
 
-      if (!prefersReducedMotion) scrambleAll();
+      scrambleAll();
 
       return { run, el };
     }
@@ -1062,7 +1059,7 @@
       if (!instance) return;
 
       if (cfg.on === 'load') {
-        fontsReady.then(() => setTimeout(instance.run, prefersReducedMotion ? 0 : (cfg.delay || 0)));
+        fontsReady.then(() => setTimeout(instance.run, cfg.delay || 0));
       } else {
         const io = new IntersectionObserver((entries) => {
           entries.forEach((entry) => {
@@ -1082,34 +1079,53 @@
     const specs = document.querySelector('.product-specs');
     const plane = document.querySelector('.product-plane');
 
+    // Watches the sticky stage, not the tall pin wrapper: the wrapper starts
+    // intersecting long before the aircraft is actually on screen, which is
+    // what made the render appear to pop in early on phones.
+    const stage = document.querySelector('.product-sticky');
     const entranceObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         heading.classList.add('is-visible');
-        setTimeout(() => visual.classList.add('is-visible'), prefersReducedMotion ? 0 : 450);
+        setTimeout(() => visual.classList.add('is-visible'), 450);
         entranceObserver.unobserve(entry.target);
       });
-    }, { threshold: 0.15 });
-    entranceObserver.observe(productPin);
+    }, { threshold: 0.5 });
+    entranceObserver.observe(stage);
+
+    // On phones the pin exists purely to hold the page still: the rows time
+    // themselves in rather than tracking scroll, so they arrive at a readable
+    // pace whether the reader keeps scrolling or stops.
+    let specSequenceStarted = false;
+    function startSpecSequence() {
+      if (specSequenceStarted) return;
+      specSequenceStarted = true;
+      document.querySelectorAll('.spec-title, .spec-row').forEach((row, i) => {
+        setTimeout(() => row.classList.add('is-in'), i * 300);
+      });
+    }
 
     // --- Scroll-driven pin animation: plane slides right, then specs reveal ---
     let ticking = false;
     function updateProductScroll() {
       ticking = false;
-      // Not pinned below 720px, so there is no scroll progress to map.
-      if (mobileQuery.matches) return;
       const rect = productPin.getBoundingClientRect();
       const scrollableDistance = productPin.offsetHeight - window.innerHeight;
       if (scrollableDistance <= 0) return;
       const scrolled = -rect.top;
       const progress = Math.min(Math.max(scrolled / scrollableDistance, 0), 1);
 
+      if (mobileQuery.matches) {
+        // No room to slide the aircraft aside at this width, so the only thing
+        // the pin drives is the start of the timed row sequence.
+        if (progress > 0.18) startSpecSequence();
+        return;
+      }
+
       // Plane slide happens across the 15%-65% range of the pin scroll.
-      // Below 720px the spec sheet stacks under the aircraft instead of
-      // sitting beside it, so there is nothing to slide out of the way.
       const slideProgress = Math.min(Math.max((progress - 0.15) / 0.5, 0), 1);
-      const slideDistance = window.innerWidth <= 720 ? 0 : Math.min(280, window.innerWidth * 0.22);
-      plane.style.transform = prefersReducedMotion ? '' : `translateX(${slideProgress * slideDistance}px)`;
+      const slideDistance = Math.min(280, window.innerWidth * 0.22);
+      plane.style.transform = `translateX(${slideProgress * slideDistance}px)`;
 
       // Specs reveal once the slide is mostly done, staying visible through
       // the rest of the pin range (the "hold" before releasing to the next section).
@@ -1124,26 +1140,12 @@
     }, { passive: true });
     updateProductScroll();
 
-    // --- Spec sheet reveals row by row on phones ---
-    // The desktop sheet fades in as one block driven by pin progress; without
-    // a pin there is no progress to drive it, so each row earns its own entry.
-    if (mobileQuery.matches) {
-      const specIO = new IntersectionObserver((entries) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add('is-in');
-          specIO.unobserve(entry.target);
-        });
-      }, { threshold: 0.6 });
-      document.querySelectorAll('.spec-title, .spec-row').forEach((el) => specIO.observe(el));
-    }
-
     // --- Generic staggered reveals ---
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         const step = parseInt(entry.target.getAttribute('data-reveal-step') || '0', 10);
-        entry.target.style.transitionDelay = prefersReducedMotion ? '0ms' : (step * 80) + 'ms';
+        entry.target.style.transitionDelay = (step * 80) + 'ms';
         entry.target.classList.add('is-in');
         revealObserver.unobserve(entry.target);
       });
@@ -1167,7 +1169,7 @@
       // Lags the page slightly so the ridge sits behind the type rather than
       // on the same plane. Zero at the top, so the tuned hero position is
       // exactly what it was.
-      if (terrain && !prefersReducedMotion) {
+      if (terrain) {
         terrain.style.transform = 'translateY(' + (Math.min(y, 1000) * 0.14) + 'px)';
       }
     }
