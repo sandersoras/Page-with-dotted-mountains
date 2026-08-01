@@ -209,7 +209,11 @@
     display: block;
   }
   @media (max-width: 720px) {
-    .hero-terrain { height: 220px; }
+    /* Taller crop so the ridge climbs toward the type instead of sitting as a
+       thin strip at the bottom of an empty screen. A taller box also means the
+       cover scale is driven by height rather than width, so the range is
+       rendered larger rather than just revealing more empty sky. */
+    .hero-terrain { height: 340px; }
     /* Larger than it looks: --nav-h is a rounded 60px here while the real
        header is ~71px, so .hero-viewport overshoots the screen bottom by
        ~11px. This keeps the arrows clear of a phone's bottom browser bar. */
@@ -285,15 +289,15 @@
   }
   .product-heading.is-visible { opacity: 1; transform: translateY(0); }
 
-  /* Rises and settles rather than just fading. A bare opacity change on a
-     large image reads as a pop; the small travel gives the eye something to
-     follow so it arrives instead of appearing. */
+  /* Fades and slides up together in one quick move. The longer travel is what
+     makes it read as arriving rather than appearing. */
   .product-visual {
     margin-top: 24px;
     opacity: 0;
-    transform: translateY(26px) scale(0.985);
-    transition: opacity 1.1s cubic-bezier(.16,1,.3,1),
-                transform 1.1s cubic-bezier(.16,1,.3,1);
+    transform: translateY(70px);
+    transition: opacity 0.8s cubic-bezier(.16,1,.3,1),
+                transform 0.8s cubic-bezier(.16,1,.3,1);
+    will-change: transform, opacity;
   }
   .product-visual.is-visible { opacity: 1; transform: none; }
   .product-plane {
@@ -657,15 +661,41 @@
     }
     .product-sticky { height: 100svh; }
     .product-specs { opacity: 1; }
+    /* The stage is one screen tall and clips what does not fit. The current
+       render is a taller format than the one this was first sized against, so
+       the block has to be tightened or the heading and the last spec row get
+       cut off on short phones. */
+    /* The sticky header is opaque and sits over the top of the stage, so
+       without this the heading is drawn underneath it. Centring happens in the
+       space that is left. */
+    /* 80px, not var(--nav-h): that variable is a rounded 60px here while the
+       real header measures ~71px, which left the heading almost touching it. */
+    .product-sticky { padding-top: 80px; }
+    .product-heading { margin-bottom: 2px; }
+    .product-visual { margin-top: 12px; }
+    .product-plane { width: auto; max-width: 100%; max-height: 28svh; }
+    .spec-title { padding-bottom: 8px; }
+    .spec-row { padding: 10px 0; }
     .spec-title, .spec-row {
       opacity: 0;
-      transform: translateY(14px);
-      transition: opacity 0.7s cubic-bezier(.16,1,.3,1), transform 0.7s cubic-bezier(.16,1,.3,1);
+      transform: translateY(22px);
+      transition: opacity 0.95s cubic-bezier(.16,1,.3,1), transform 0.95s cubic-bezier(.16,1,.3,1);
     }
     .spec-title.is-in, .spec-row.is-in { opacity: 1; transform: none; }
     .roadmap-section, .contact-section { padding: 96px 0; }
     .contact-fields { gap: 24px 40px; }
     .footer-inner { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* Small phones only. Squeezing the render and the rows for everyone to suit
+     the shortest screen would waste the space a normal handset has, so the
+     tightening is gated on viewport height rather than width. */
+  @media (max-width: 720px) and (max-height: 620px) {
+    .product-plane { max-height: 18svh; }
+    .spec-row { padding: 4px 0; }
+    .spec-title { padding-bottom: 5px; }
+    .product-visual { margin-top: 6px; }
+    .product-heading { font-size: clamp(1.5rem, 6.5vw, 2.1rem); }
   }
 </style>
 </head>
@@ -724,6 +754,7 @@
       <div class="product-specs">
         <span class="spec-title">Specifications</span>
         <div class="spec-row"><span class="spec-k">Range</span><span class="spec-v">100 km out, 100 km home</span></div>
+        <div class="spec-row"><span class="spec-k">Magazine</span><span class="spec-v">5 FPVs w/ warhead</span></div>
         <div class="spec-row"><span class="spec-k">Wingspan</span><span class="spec-v">3.5 m</span></div>
         <div class="spec-row"><span class="spec-k">Propulsion</span><span class="spec-v">Electric</span></div>
         <div class="spec-row"><span class="spec-k">Launch</span><span class="spec-v">VTOL</span></div>
@@ -1108,11 +1139,25 @@
     // intersecting long before the aircraft is actually on screen, which is
     // what made the render appear to pop in early on phones.
     const stage = document.querySelector('.product-sticky');
+
+    // Wait for the render to be decoded before starting its transition.
+    // Otherwise the browser animates an image it cannot draw yet: the fade
+    // runs against nothing and the aircraft snaps in when decoding finishes,
+    // which looks exactly like no animation at all.
+    function revealVisual() {
+      if (plane.complete && plane.naturalWidth > 0) {
+        visual.classList.add('is-visible');
+      } else {
+        plane.addEventListener('load', () => visual.classList.add('is-visible'), { once: true });
+        plane.addEventListener('error', () => visual.classList.add('is-visible'), { once: true });
+      }
+    }
+
     const entranceObserver = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) return;
         heading.classList.add('is-visible');
-        setTimeout(() => visual.classList.add('is-visible'), 450);
+        setTimeout(revealVisual, 380);
         entranceObserver.unobserve(entry.target);
       });
     }, { threshold: 0.5 });
