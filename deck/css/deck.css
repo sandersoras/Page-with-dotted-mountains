@@ -410,8 +410,22 @@ video.v-off{ opacity:0; pointer-events:none; }
    brightness(0) crushes the artwork to black whatever it was, invert(.62)
    lifts it back to a steel grey, so a light logo and a dark one land in the
    same place. See assets/logo/competitors/README.md. */
+/* Competitor logos on slide 10. They replace the company name rather than
+   sitting beside it, so the column is four marks read against four valuations.
+
+   Flattened to one grey rather than shown in their own colours: this is a
+   comparison table, not a partner wall, and three brand palettes in a row
+   would out-shout the numbers the row exists for. brightness(0) crushes the
+   artwork to black whatever it was and invert(.62) lifts it back to a steel
+   grey, so a light logo and a dark one land in the same place.
+
+   Height is set and width follows, which only reads evenly because each file
+   is cropped tight to its own artwork -- an uncropped export renders as a
+   small logo floating in a large gap. See assets/logo/competitors/README.md.
+   If a file is missing the <img> replaces itself with the company name in
+   type, so the table never loses a row. */
 .colog{
-  height:34px; width:auto; display:block; flex:none;
+  height:32px; width:auto; display:block; flex:none;
   filter:grayscale(1) brightness(0) invert(.62);
   opacity:.92;
 }

@@ -11,7 +11,7 @@
      repo root, which is belt and braces -- robots.txt asks a crawler not to
      fetch, this tag tells one that already has not to publish. -->
 <meta name="robots" content="noindex, nofollow, noarchive">
-<link rel="stylesheet" href="css/deck.css?v=71">
+<link rel="stylesheet" href="css/deck.css?v=76">
 <!-- Portrait phones only. Every rule inside is behind one media query, so
      the desktop deck and the printed PDF are untouched by its presence. -->
 <link rel="stylesheet" href="css/mobile.css?v=23">
@@ -1093,10 +1093,8 @@
     <div data-anim="up" style="animation-delay:.42s; display:grid;
                 grid-template-columns:280px 1fr 200px 300px; gap:0 48px; align-items:baseline;
                 border-top:1px solid var(--hair); padding:22px 0;">
-      <div style="display:flex; align-items:center; gap:16px;">
-        <img class="colog" src="assets/logo/competitors/anduril.svg" alt="" onerror="this.remove()">
-        <span style="font-size:31px; font-weight:600; color:var(--steel);">Anduril</span>
-      </div>
+      <img class="colog" src="assets/logo/competitors/anduril.png" alt="Anduril"
+           onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:this.alt,style:'font-size:31px;font-weight:600;color:var(--steel)'}))">
       <div style="font-size:25px; font-weight:300; color:var(--steel);">Autonomous military systems</div>
       <div style="font-family:var(--display); font-weight:700; font-size:34px; color:var(--frost); text-align:right;">$61B</div>
       <div style="font-family:var(--mono); font-size:24px; font-weight:600; letter-spacing:.1em;
@@ -1105,10 +1103,8 @@
     <div data-anim="up" style="animation-delay:.52s; display:grid;
                 grid-template-columns:280px 1fr 200px 300px; gap:0 48px; align-items:baseline;
                 border-top:1px solid var(--hair); padding:22px 0;">
-      <div style="display:flex; align-items:center; gap:16px;">
-        <img class="colog" src="assets/logo/competitors/helsing.svg" alt="" onerror="this.remove()">
-        <span style="font-size:31px; font-weight:600; color:var(--steel);">Helsing</span>
-      </div>
+      <img class="colog" src="assets/logo/competitors/helsing.png" alt="Helsing"
+           onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:this.alt,style:'font-size:31px;font-weight:600;color:var(--steel)'}))">
       <div style="font-size:25px; font-weight:300; color:var(--steel);">European defence AI</div>
       <div style="font-family:var(--display); font-weight:700; font-size:34px; color:var(--frost); text-align:right;">$18B</div>
       <div style="font-family:var(--mono); font-size:24px; font-weight:600; letter-spacing:.1em;
@@ -1117,10 +1113,8 @@
     <div data-anim="up" style="animation-delay:.62s; display:grid;
                 grid-template-columns:280px 1fr 200px 300px; gap:0 48px; align-items:baseline;
                 border-top:1px solid var(--hair); padding:22px 0;">
-      <div style="display:flex; align-items:center; gap:16px;">
-        <img class="colog" src="assets/logo/competitors/stark.svg" alt="" onerror="this.remove()">
-        <span style="font-size:31px; font-weight:600; color:var(--steel);">Stark</span>
-      </div>
+      <img class="colog" src="assets/logo/competitors/stark.png" alt="Stark"
+           onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:this.alt,style:'font-size:31px;font-weight:600;color:var(--steel)'}))">
       <div style="font-size:25px; font-weight:300; color:var(--steel);">One-way effectors</div>
       <div style="font-family:var(--display); font-weight:700; font-size:34px; color:var(--frost); text-align:right;">$4B</div>
       <div style="font-family:var(--mono); font-size:24px; font-weight:600; letter-spacing:.1em;
@@ -1129,7 +1123,22 @@
     <div data-anim="up" style="animation-delay:.76s; display:grid;
                 grid-template-columns:280px 1fr 200px 300px; gap:0 48px; align-items:baseline;
                 border-top:1px solid var(--hair); border-bottom:1px solid var(--hair); padding:22px 0;">
-      <div style="font-size:31px; font-weight:600; color:var(--frost);">STRID</div>
+      <!-- Our own row is the mark plus the wordmark, so it reads as a logo
+           beside three logos rather than as the one name still set in type.
+           The mark is drawn from the STRID_MARK table in deck.js, which is why
+           it is an empty <svg> here.
+
+           44px, not the 23px cap height of the text beside it. The brief was
+           "as tall as the letters" and at 23 it is not a mark, it is a smudge:
+           twenty-seven dots across a 512-unit box put every dot under a pixel.
+           Rendered at 23 / 32 / 40 / 52 / 64 side by side, it starts reading
+           as an arrow at 40. 44 is the smallest size at which this is a logo,
+           and it sits within the row's line height rather than growing it. -->
+      <div style="display:flex; align-items:center; gap:16px;">
+        <svg class="strid-mark" style="width:44px; height:44px; flex:none; color:var(--frost);"
+             aria-hidden="true"></svg>
+        <span style="font-size:31px; font-weight:600; color:var(--frost); letter-spacing:.01em;">STRID</span>
+      </div>
       <div style="font-size:25px; font-weight:300; color:var(--steel);">The carrier layer</div>
       <div style="font-family:var(--display); font-weight:700; font-size:34px; color:var(--signal); text-align:right;">Pre-seed</div>
       <div style="font-family:var(--mono); font-size:24px; font-weight:600; letter-spacing:.1em;
@@ -1314,8 +1323,8 @@
 
       <div class="phase on" data-anim="up" style="animation-delay:.36s">
         <div class="pn">01 &nbsp;/&nbsp; Land</div>
-        <div class="pt">Ukraine</div>
-        <p>Test, feedback, iterate.</p>
+        <div class="pt">The frontline</div>
+        <p>Test, feedback and iterate on the Ukrainian frontline.</p>
       </div>
 
       <div class="phase" data-anim="up" style="animation-delay:.5s">
