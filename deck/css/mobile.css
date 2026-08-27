@@ -409,7 +409,18 @@
      drop one and the whole control becomes a solid block. */
   /* Tight, so the bar keeps as much of the row as it can: the button and the
      clock are fixed and everything left over is scrubbing distance. */
-  .slide .xport{ gap:22px !important; }
+  /* The row has to be allowed to be wide. Slide 08 pins its transport at a
+     fixed `width:520px`, which is right for a control that is meant to be
+     found and not noticed on a 1920 canvas. Grow the button and the clock
+     inside that same 520 and there is nothing left: the bar measured 14 real
+     pixels, which is about as wide as its own thumb, and dragging it did
+     nothing because there was nowhere to drag it to. It spans the slide on a
+     handset instead. */
+  .slide .xport{
+    gap:22px !important;
+    width:auto !important;
+    left:var(--mx) !important; right:var(--mx) !important;
+  }
   .slide .xport .xport-btn,
   .slide .xport.subtle .xport-btn{
     width:96px !important; height:96px !important;      /* 57 real px */
@@ -506,7 +517,18 @@
      track is 1.1. To clear Apple's 44px minimum here a control has to be
      written at 122 units, which is why these numbers look absurd next to the
      portrait ones. They are the same size on the glass. */
-  .slide .xport{ gap:30px !important; }
+  /* The row has to be allowed to be wide. Slide 08 pins its transport at a
+     fixed `width:520px`, which is right for a control that is meant to be
+     found and not noticed on a 1920 canvas. Grow the button and the clock
+     inside that same 520 and there is nothing left: the bar measured 14 real
+     pixels, which is about as wide as its own thumb, and dragging it did
+     nothing because there was nowhere to drag it to. It spans the slide on a
+     handset instead. */
+  .slide .xport{
+    gap:26px !important;
+    width:auto !important;
+    left:var(--mx) !important; right:var(--mx) !important;
+  }
   .slide .xport .xport-btn,
   .slide .xport.subtle .xport-btn{
     width:132px !important; height:132px !important;     /* 48 real px */
@@ -529,8 +551,10 @@
   .slide .xport.subtle .xport-seek::-moz-range-thumb{
     width:72px !important; height:72px !important;
   }
+  /* 30, not 38: eleven characters of tabular mono is 250 units at 38 and
+     that came straight out of the bar's width. */
   .slide .xport-t,
-  .slide .xport.subtle .xport-t{ font-size:38px !important; }
+  .slide .xport.subtle .xport-t{ font-size:30px !important; }
 
   .slide .xport.subtle{ --xfill:var(--frost); }
   .slide .xport.subtle .xport-btn{ border-color:var(--frost); color:var(--frost); }
