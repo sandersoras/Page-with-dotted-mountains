@@ -601,20 +601,57 @@
     want = want.filter(function (u, i) { return u && want.indexOf(u) === i; });
     var at = 0;
 
-    // drop to the next weight down, or give up and show the placeholder
+    /* Retry before walking, and this is what fixes the placeholder appearing
+       at random on a phone.
+
+       The walk assumes an error means "that file is not on this machine",
+       which is true of a fresh clone and false of a handset. On cellular a
+       15 MB file can fail once for reasons that have nothing to do with the
+       file, and the walk then burned through both remaining weights -- which
+       on the published site are 404s, because only the default encode is
+       uploaded -- and landed on the dashed authoring slot. Permanently: there
+       was nothing to try again.
+
+       So each source gets three goes with a widening delay before the walk
+       moves on. A network blip costs a second now instead of the slide. */
+    var tries = 0;
+    var RETRIES = 3;
+
+    function attempt(url) {
+      // From the second go, break the cache. A reload is the case this exists
+      // for: Chrome revalidates a partially cached 15 MB media resource and
+      // the element can come back with an error on a file that is perfectly
+      // fine in a fresh tab. Re-requesting the same URL hits the same poisoned
+      // entry; a unique one does not.
+      v.src = tries > 1 ? url + (url.indexOf('?') < 0 ? '?' : '&') + 'r=' + tries : url;
+      v.load();
+    }
+
     function step() {
-      if (at + 1 < want.length) {
-        v.src = want[++at];
-        v.load();
+      if (tries < RETRIES) {
+        tries++;
+        setTimeout(function () { attempt(want[at]); }, tries * 600);
         return;
       }
-      v.classList.add('v-off');
-      if (fallback) fallback.style.display = '';
+      tries = 0;
+      if (at + 1 < want.length) {
+        at++;
+        attempt(want[at]);
+        return;
+      }
+      /* Out of options. Keep the element on screen if it has a poster -- the
+         poster IS the fallback, and hiding the video would hide it too. Only
+         the build machine gets the dashed authoring slot: "Drop launch footage
+         here" is useful to whoever is assembling the deck and is the last
+         thing an investor should see because a packet went missing. */
+      if (!v.getAttribute('poster')) v.classList.add('v-off');
+      if (fallback && LOCAL) fallback.style.display = '';
       slide.classList.remove('has-video');
     }
 
     // it has frames: show it and retire the placeholder
     function ready() {
+      tries = 0;
       v.classList.remove('v-off');
       if (fallback) fallback.style.display = 'none';
       slide.classList.add('has-video');
