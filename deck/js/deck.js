@@ -11,6 +11,24 @@
   'use strict';
 
   var stage  = document.getElementById('stage');
+
+  /* The NOTAT slides are internal working notes and have no business being on
+     a public URL. `hide-internal` only ever governed the PDF, so on the web
+     they were two arrow presses past the ask.
+
+     Local means localhost, a file:// open, or a private-network address --
+     which keeps them visible when the deck is served to a phone over wifi,
+     because that is still us looking at it. Anything else is the internet.
+     They are removed from the DOM rather than hidden: a hidden slide is still
+     in `slides`, still navigable, and still one press past the end.
+     `?all` puts them back on any host, for checking the live build. */
+  var LOCAL = location.protocol === 'file:' ||
+              /^(localhost|127\.0\.0\.1|\[::1\]|0\.0\.0\.0)$/.test(location.hostname) ||
+              /^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(location.hostname);
+  if (!LOCAL && !/(^|[?&])all(=|&|$)/.test(location.search)) {
+    document.querySelectorAll('.slide.internal').forEach(function (s) { s.remove(); });
+  }
+
   var slides = Array.prototype.slice.call(document.querySelectorAll('.slide'));
   var chrome = document.getElementById('chrome');
   var idx    = 0;
@@ -146,20 +164,33 @@
                        ' &nbsp;·&nbsp; N hide notat &nbsp;·&nbsp; P pdf';
   }
 
+  /* One path forward and one back, whatever pressed them. The click handler
+     used to call show() directly, which meant a tap skipped the whole slide
+     instead of advancing its steps: on a phone, where a tap is the only input
+     there is, the battlefield on 03 could not be played at all. Everything
+     goes through these two now -- keys, clicks and taps -- so a step reveal
+     behaves the same however it is driven. */
+  function advance() {
+    var live = slides[idx], max = stepMax(live), cur = live._step || 0;
+    if (cur < max) { live._step = cur + 1; applyStep(live); }
+    else if (max > 0 && !live._settled) { settle(live); }
+    else { show(idx + 1); }
+  }
+  function back() {
+    var live = slides[idx], cur = live._step || 0;
+    if (live._settled) { unsettle(live); }
+    else if (cur > 0) { live._step = cur - 1; applyStep(live); }
+    else { show(idx - 1); }
+  }
+
   document.addEventListener('keydown', function (e) {
     if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') {
       e.preventDefault();
-      var live = slides[idx], max = stepMax(live), cur = live._step || 0;
-      if (cur < max) { live._step = cur + 1; applyStep(live); }
-      else if (max > 0 && !live._settled) { settle(live); }
-      else { show(idx + 1); }
+      advance();
     }
     else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
       e.preventDefault();
-      var live2 = slides[idx], cur2 = live2._step || 0;
-      if (live2._settled) { unsettle(live2); }
-      else if (cur2 > 0) { live2._step = cur2 - 1; applyStep(live2); }
-      else { show(idx - 1); }
+      back();
     }
     else if (e.key === 'Home') { show(0); }
     else if (e.key === 'End')  { show(slides.length - 1); }
@@ -202,8 +233,8 @@
   }
 
   document.addEventListener('click', function (e) {
-    if (e.target.closest('a,button,input')) return;
-    show(idx + (e.clientX > window.innerWidth * 0.35 ? 1 : -1));
+    if (e.target.closest('a,button,input,#rotate')) return;
+    if (e.clientX > window.innerWidth * 0.35) advance(); else back();
   });
 
   /* --- counter effect --------------------------------------------------- */
@@ -886,6 +917,20 @@
       p.style.strokeDashoffset = len;
     });
   }
+
+  /* --- turn your phone ---------------------------------------------------
+     Whether the prompt is on screen is pure CSS: it lives inside the portrait
+     media query in mobile.css, so rotating the handset makes the query stop
+     matching and the prompt goes with it. No orientation listener, nothing to
+     keep in sync, and it comes back if they rotate back.
+
+     The only thing JS does is the escape hatch. A reader who wants to stay in
+     portrait taps once and is not asked again this session -- otherwise the
+     one input a phone has would be spent arguing with them. */
+  var rotate = document.getElementById('rotate');
+  if (rotate) rotate.addEventListener('click', function () {
+    document.body.classList.add('rotate-dismissed');
+  });
 
   /* --- boot ------------------------------------------------------------- */
   document.querySelectorAll('video[data-optional]').forEach(wireOptionalVideo);

@@ -2,10 +2,12 @@
    STRID deck  ·  portrait phone layer
    ==========================================================================
 
-   Everything in this file lives inside one media query and nothing outside it
-   exists. Load it after deck.css and the desktop deck is byte-for-byte the
-   same deck: no rule here can match a landscape viewport or one wider than
-   820px, and `screen` keeps it out of the PDF as well.
+   Two media queries and nothing outside them. The first is the portrait
+   layout and is almost the whole file; the second is one rule for phones in
+   landscape, which need no layout changes but still have no keyboard. Load
+   this after deck.css and the desktop deck is byte-for-byte the same deck: no
+   rule here can match a viewport that is both wider than 820px and taller
+   than 500px, and `screen` keeps the file out of the PDF as well.
 
    HOW IT WORKS, and why it is not a reflow into phone pixels.
 
@@ -172,9 +174,10 @@
   .slide .pad img{ max-width:100%; }
 
   /* --- the wide diagrams ------------------------------------------------
-     Four drawings are landscape by nature: the range comparison on 02 is
-     1680x230, the battlefield on 03 is 1850x524, and the interceptor closing
-     on the carrier on 05 is 1680x372. Fitted to 584 units they come out 104, 80 and 165 units
+     Three drawings are landscape by nature: the battlefield on 03 is
+     1850x524, the interceptor closing on the carrier on 05 is 1680x372, and
+     both charts on 09 are drawn to a wide frame. (02 was a fourth until its
+     range comparison came off the slide.) Fitted to 584 units they come out 104, 80 and 165 units
      tall, which is 60, 47 and 97 real pixels -- the shapes survive and every
      label in them is gone.
 
@@ -187,7 +190,6 @@
 
      Do not raise 1600 much further. The pan is bearable at roughly two and a
      half screens of width and stops being so at four. */
-  .slide[data-slide="2"] .pad,
   .slide[data-slide="3"] .pad,
   .slide[data-slide="5"] .pad,
   .slide[data-slide="9"] .pad{
@@ -198,7 +200,6 @@
        scrollbar the pan does not need. */
     scrollbar-width:none;
   }
-  .slide[data-slide="2"] .pad::-webkit-scrollbar,
   .slide[data-slide="3"] .pad::-webkit-scrollbar,
   .slide[data-slide="5"] .pad::-webkit-scrollbar,
   .slide[data-slide="9"] .pad::-webkit-scrollbar{ display:none; }
@@ -208,7 +209,6 @@
      off the right edge because of it. Everything that is not the drawing is
      pinned back to the column width. --m-col is the canvas minus its two
      margins, and the canvas is always 660 units wide here. */
-  .slide[data-slide="2"] .pad > *:not(svg),
   .slide[data-slide="3"] .pad > *:not(svg),
   .slide[data-slide="5"] .pad > *:not(svg),
   .slide[data-slide="9"] .pad > *:not(svg){
@@ -217,7 +217,6 @@
     align-self:flex-start;
   }
 
-  .slide[data-slide="2"] .pad > svg,
   .slide[data-slide="3"] .pad > svg,
   .slide[data-slide="5"] .pad > svg{
     width:1600px !important;
@@ -382,7 +381,66 @@
     z-index:1; pointer-events:none;
   }
 
+  /* 02's two halves are a fixed 1240px pair, centred in the free space below
+     the copy. Neither survives a 584-unit column, so the width goes and the
+     grid collapses like every other one in the deck. */
+  .slide[data-slide="2"] .pad > [style*="width:1240px"],
+  .slide[data-slide="2"] .pad > [style*="width: 1240px"]{
+    width:auto !important;
+    margin:56px 0 0 !important;
+  }
+
   /* --- rail and chrome --------------------------------------------------- */
   .rail{ font-size:17px; }
+  #chrome{ display:none; }
+
+  /* --- turn your phone ---------------------------------------------------
+     A full-screen prompt over the deck, and the only rule that shows it. It
+     is inside this media query, so rotating the handset is what dismisses it:
+     the query stops matching and the prompt goes with it. Nothing listens for
+     orientation, nothing has to be kept in sync, and it comes back if they
+     rotate back to portrait, which is correct -- they are in portrait again.
+
+     The portrait layout underneath is real and works; this asks for landscape
+     because the deck is 16:9 and reads far better that way. A tap sets
+     `.rotate-dismissed` on the body and the reader is not asked again.
+
+     Not inside #stage: the stage is a scaled canvas at 0.59, and chrome that
+     shrinks with the content is chrome nobody can read. Real pixels here. */
+  #rotate{
+    display:flex;
+    position:fixed; inset:0; z-index:200;
+    flex-direction:column; align-items:center; justify-content:center;
+    gap:26px; padding:32px; text-align:center;
+    background:var(--void);
+    color:var(--frost);
+    -webkit-user-select:none; user-select:none;
+  }
+  body.rotate-dismissed #rotate{ display:none; }
+
+  #rotate svg{ color:var(--signal); }
+  #rotate .r-t{
+    font-family:var(--display); font-weight:800; font-size:32px;
+    letter-spacing:-.02em; line-height:1.1;
+  }
+  #rotate .r-s{
+    font-family:var(--mono); font-size:13px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--steel-dim);
+  }
+}
+
+/* ==========================================================================
+   Phones in landscape
+   The one thing that has to go here as well. Everything above is layout for a
+   portrait canvas and none of it applies once the handset is turned -- the
+   deck goes back to its own 1920x1080 stage, which is the point of asking.
+   But the chrome bar is a keyboard legend, and a phone has no keyboard in
+   either orientation.
+
+   Keyed on height rather than `pointer:coarse`: a handset in landscape is
+   about 430px tall at the most, and no laptop is. A touchscreen laptop would
+   have matched a coarse-pointer query and lost a legend it can still use.
+   ========================================================================== */
+@media screen and (max-height: 500px) and (orientation: landscape) {
   #chrome{ display:none; }
 }

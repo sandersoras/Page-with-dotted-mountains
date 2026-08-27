@@ -546,6 +546,12 @@ p.lead{
 }
 #chrome b{ color:#8a939c; font-weight:500; }
 
+/* The rotate prompt. Hidden everywhere by default and switched on by exactly
+   one rule, in the portrait block of css/mobile.css. Sitting outside #stage
+   means it is measured in real pixels rather than deck units, which is right
+   for chrome and wrong for content. */
+#rotate{ display:none; }
+
 /* ==========================================================================
    PRINT  ·  this is the investor deliverable
    Ctrl+P -> Save as PDF. One slide per page, 13.333in x 7.5in landscape.
