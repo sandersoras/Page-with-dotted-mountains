@@ -688,11 +688,37 @@
   var audioOn    = false;
   var SYNC_SLIP  = 0.35;    // seconds of drift tolerated before we pull it back
 
+  /* Does this slide carry sound the M key governs? Either a film with its own
+     track, or a separate soundtrack element riding one. Used to decide whether
+     the chrome bar mentions M at all. */
   function slideAudio(slide) {
-    return slide ? slide.querySelector('audio[data-slide-audio]') : null;
+    return slide ? slide.querySelector('video[data-slide-sound], audio[data-slide-audio]') : null;
   }
 
   function updateAudio() {
+    /* A film with its own track. One element, one clock, nothing to sync --
+       muting is the whole of it.
+
+       This replaced a separate <audio> riding the film's clock, and the reason
+       is worth keeping: two elements drift, and the correction was a hard seek
+       on the audio whenever they were more than SYNC_SLIP apart. On a laptop
+       that fires rarely and is inaudible. On a phone it fired about once a
+       second and every seek is a gap, so the sound stuttered continuously.
+       Raising the threshold only makes it rarer. Muxing the track into the
+       film removes the second clock instead of tuning it.
+
+       It stays muted until the slide is live AND someone has asked for sound.
+       Muted is also what lets it autoplay at all. */
+    document.querySelectorAll('video[data-slide-sound]').forEach(function (v) {
+      var own = v.closest('.slide');
+      var live = own && own.classList.contains('is-active');
+      v.muted = !(live && audioOn && audioArmed && !document.hidden);
+    });
+
+    /* A soundtrack alongside a silent film. Nothing uses this now -- slide 08
+       was the last one and its audio is muxed in -- but the machinery is
+       correct and costs nothing, so a future slide with a film that cannot be
+       re-encoded still has a way to carry sound. */
     document.querySelectorAll('audio[data-slide-audio]').forEach(function (el) {
       var own  = el.closest('.slide');
       var live = own.classList.contains('is-active');

@@ -14,7 +14,7 @@
 <link rel="stylesheet" href="css/deck.css?v=71">
 <!-- Portrait phones only. Every rule inside is behind one media query, so
      the desktop deck and the printed PDF are untouched by its presence. -->
-<link rel="stylesheet" href="css/mobile.css?v=18">
+<link rel="stylesheet" href="css/mobile.css?v=19">
 </head>
 <body>
 <div id="viewport"><div id="stage">
@@ -761,19 +761,27 @@
        scrim, light enough to actually play. ?full for the camera master,
        ?light for the copy you send out. The dashed placeholder below removes
        itself once a file loads. -->
-  <video class="video-bleed dim" data-optional muted loop playsinline preload="auto"
+  <video class="video-bleed dim" data-optional data-slide-sound muted loop playsinline preload="auto"
          src="assets/video/rocket-origin.mp4"
          data-full="assets/video/rocket-origin-full.mp4"
          data-light="assets/video/rocket-origin-light.mp4"></video>
 
-  <!-- Soundtrack, optional. The film above is muted because a browser will only
-       autoplay a muted video, so sound rides alongside it rather than inside
-       it: adding audio never means re-encoding and re-shipping the 109 MB
-       film, and a few MB of audio can live in git where the video cannot.
-       Drop the file in and slide 02 has sound; leave it out and the slide is
-       exactly what it was. M toggles it in the room. See "Sound on slide 02"
-       in RESUME.md. -->
-  <audio data-slide-audio loop preload="auto" src="assets/audio/rocket-origin.m4a"></audio>
+  <!-- The sound is IN the film, not beside it, and that is a change from how
+       this slide used to work. It rode alongside as a separate
+       <audio data-slide-audio> because the film had no audio track and
+       re-shipping a 109 MB encode to add one was not worth it.
+
+       Two elements mean two clocks, and updateAudio() kept them together by
+       seeking the audio back to the video's position whenever they drifted
+       more than 0.35s. On a laptop that is inaudible. On a phone it was a hard
+       seek roughly every second, and every seek is a gap -- the sound stuttered
+       badly and there is no threshold that fixes it, only one that makes it
+       rarer.
+
+       The film is 14 MB now and we control the encode, so the track is muxed
+       in: 15.1 MB with audio, and nothing to keep in sync. It still autoplays
+       muted, because no browser will autoplay anything else, and the speaker
+       button below unmutes it. See updateAudio(). -->
 
   <div class="slot video-fallback" style="position:absolute; inset:0; border:0;">
     <div class="slot-tag" style="top:124px; left:120px;">Video slot &nbsp;/&nbsp; rocket launch</div>
@@ -2092,7 +2100,7 @@
 </div>
 
 <div id="chrome"></div>
-<script src="js/deck.js?v=71"></script>
+<script src="js/deck.js?v=72"></script>
 
 </body>
 </html>

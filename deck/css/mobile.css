@@ -390,6 +390,40 @@
     margin:56px 0 0 !important;
   }
 
+  /* --- the media transport ----------------------------------------------
+     The scrubber was drawn for a mouse on a 1920 canvas: a 3px track and an
+     11px thumb, which at the 0.59 phone scale are under 2px and under 7px of
+     actual screen. You cannot put a finger on that.
+
+     The height on the input is the hit area, not the track. `background-clip:
+     content-box` with vertical padding paints the JS-written fill gradient
+     only in the middle band, so the bar still looks like a bar while the
+     element you can actually touch is 44 units -- about 26 real pixels -- tall.
+     Do not remove the padding without also fixing the fill: deck.js writes
+     `background` on this element and content-box is what keeps it thin. */
+  .slide .xport{ gap:26px !important; }
+  .slide .xport .xport-btn,
+  .slide .xport.subtle .xport-btn{
+    width:64px !important; height:64px !important;
+  }
+  .slide .xport-seek,
+  .slide .xport.subtle .xport-seek{
+    height:44px !important;
+    padding:15px 0 !important;
+    border-radius:0 !important;
+    background-clip:content-box !important;
+  }
+  .slide .xport-seek::-webkit-slider-thumb,
+  .slide .xport.subtle .xport-seek::-webkit-slider-thumb{
+    width:34px !important; height:34px !important;
+  }
+  .slide .xport-seek::-moz-range-thumb,
+  .slide .xport.subtle .xport-seek::-moz-range-thumb{
+    width:34px !important; height:34px !important;
+  }
+  .slide .xport-t,
+  .slide .xport.subtle .xport-t{ font-size:24px !important; }
+
   /* --- rail and chrome --------------------------------------------------- */
   .rail{ font-size:17px; }
   #chrome{ display:none; }
