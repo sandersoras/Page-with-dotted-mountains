@@ -1,0 +1,6 @@
+# The deck is investor material and should not be indexed. This asks crawlers
+# not to fetch it; deck/index.html also carries <meta name="robots"
+# content="noindex, nofollow, noarchive">, which is what covers a crawler that
+# ignores this file or reached the page from a link somewhere else. Keep both.
+User-agent: *
+Disallow: /deck/
