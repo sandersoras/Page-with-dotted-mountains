@@ -761,7 +761,11 @@
        scrim, light enough to actually play. ?full for the camera master,
        ?light for the copy you send out. The dashed placeholder below removes
        itself once a file loads. -->
+  <!-- poster: a frame from the film itself, so a handset that refuses to
+       autoplay shows the engine firing rather than a black rectangle. It is
+       what the slide falls back to, not decoration -- 45 KB. -->
   <video class="video-bleed dim" data-optional data-slide-sound muted loop playsinline preload="auto"
+         poster="assets/render/rocket-origin-poster.jpg"
          src="assets/video/rocket-origin.mp4"
          data-full="assets/video/rocket-origin-full.mp4"
          data-light="assets/video/rocket-origin-light.mp4"></video>
@@ -2100,7 +2104,7 @@
 </div>
 
 <div id="chrome"></div>
-<script src="js/deck.js?v=72"></script>
+<script src="js/deck.js?v=73"></script>
 
 </body>
 </html>

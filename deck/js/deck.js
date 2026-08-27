@@ -712,7 +712,12 @@
     document.querySelectorAll('video[data-slide-sound]').forEach(function (v) {
       var own = v.closest('.slide');
       var live = own && own.classList.contains('is-active');
-      v.muted = !(live && audioOn && audioArmed && !document.hidden);
+      var want = !(live && audioOn && audioArmed && !document.hidden);
+      // Only when it actually changes. This runs once a second from the
+      // watchdog, and assigning to .muted is not free on iOS even when the
+      // value is the same -- it is a state change on the media element and
+      // playback can hiccup on it. Nothing on a desktop will show you that.
+      if (v.muted !== want) v.muted = want;
     });
 
     /* A soundtrack alongside a silent film. Nothing uses this now -- slide 08
