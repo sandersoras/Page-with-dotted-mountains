@@ -291,6 +291,22 @@ p.lead{
    into the same register rather than burying it under a heavier scrim. */
 .video-bleed.dim{ filter:saturate(.78) contrast(1.05) brightness(.68); }
 
+/* Hiding a video WITHOUT display:none, and this is not a style preference.
+
+   iOS Safari does not load or decode a video that is display:none. It stays at
+   readyState 0 forever, never fires loadeddata, and never plays. Two things in
+   this deck were hidden that way and both were broken on a phone and fine on a
+   laptop: the slide 04 hold loop never took over, because handOver() waits for
+   readyState >= 2 that could not arrive, and the slide 08 rocket film never
+   appeared at all, because wireOptionalVideo() hides the element until
+   loadeddata and loadeddata was waiting on the element being shown.
+
+   Opacity keeps the element in the render tree, so iOS loads and decodes it.
+   Both videos are position:absolute full-bleed and stacked, so the one at
+   opacity 1 is simply the one you see. Do not swap this back for display:none.
+   Nothing in a headless desktop browser will tell you it is wrong. */
+video.v-off{ opacity:0; pointer-events:none; }
+
 /* the still that stands in for the video on paper */
 .video-print-still{ display:none; }
 

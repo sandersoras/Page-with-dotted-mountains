@@ -389,15 +389,25 @@
       slide.classList.toggle('reveal-name',  t >= CUE_NAME);
     }
 
-    // Hand over on the last frame. If the loop never loaded, the reveal simply
-    // holds where it stopped, which is what it did before there was a loop.
+    /* Show one of the two films and hide the other. Never display:none -- see
+       video.v-off in deck.css. Both are full-bleed and stacked, so this is
+       only deciding which one you can see. */
+    function showLoop() { if (b) b.classList.remove('v-off'); a.classList.add('v-off'); }
+    function showFilm() { if (b) b.classList.add('v-off'); a.classList.remove('v-off'); }
+
+    // Hand over on the last frame. It used to bail unless the loop had already
+    // reached readyState 2, which on iOS it never did: the element was hidden
+    // with display:none and Safari does not load a hidden video, so the reveal
+    // ran to its end and stopped dead. Now it hands over and lets play() do
+    // the loading, and only falls back to holding the last frame if that
+    // genuinely fails.
     function handOver() {
       slide.dataset.played = '1';
-      if (!b || b.readyState < 2) return;
-      b.style.display = '';
-      a.style.display = 'none';
+      if (!b) return;
+      showLoop();
       try { b.currentTime = 0; } catch (e) {}
-      b.play().catch(function () {});
+      var p = b.play();
+      if (p && p.catch) p.catch(function () { showFilm(); });
     }
 
     // The film ran to the end before you left, so the hold loop owns the slide
@@ -405,10 +415,13 @@
     // nineteen seconds of film the room has already watched.
     function resumeAtLoop() {
       slide.classList.add('reveal-instant', 'reveal-specs', 'reveal-name');
-      if (b && b.readyState >= 2) {
-        b.style.display = '';
-        a.style.display = 'none';
-        b.play().catch(function () {});
+      if (b) {
+        showLoop();
+        var p = b.play();
+        if (p && p.catch) p.catch(function () {
+          showFilm();
+          try { a.currentTime = a.duration || 0; } catch (e) {}
+        });
       } else {
         try { a.currentTime = a.duration || 0; } catch (e) {}
       }
@@ -417,8 +430,8 @@
     }
 
     function reset() {
-      if (b) { b.pause(); b.style.display = 'none'; }
-      a.style.display = '';
+      if (b) b.pause();
+      showFilm();
     }
 
     // Autoplay can still be refused even when muted. Rather than leave a black
@@ -595,19 +608,30 @@
         v.load();
         return;
       }
-      v.style.display = 'none';
+      v.classList.add('v-off');
       if (fallback) fallback.style.display = '';
       slide.classList.remove('has-video');
     }
 
     // it has frames: show it and retire the placeholder
     function ready() {
-      v.style.display = '';
+      v.classList.remove('v-off');
       if (fallback) fallback.style.display = 'none';
       slide.classList.add('has-video');
     }
 
-    v.style.display = 'none';
+    /* Hidden with opacity, not display, and that is the whole fix for the
+       rocket film being blank on a phone. This element starts hidden and is
+       only shown once it has frames -- but iOS will not give a display:none
+       video any frames, so the condition could never be met and slide 08 came
+       up empty on every handset while looking perfect on a laptop.
+
+       loadedmetadata is listened for as well as loadeddata: iOS treats
+       preload="auto" as a suggestion and often gets no further than metadata
+       until something asks the element to play. Metadata is enough to know the
+       file is really there, which is all this is deciding. */
+    v.classList.add('v-off');
+    v.addEventListener('loadedmetadata', ready);
     v.addEventListener('loadeddata', ready);
     // A big progressive file can stall on its first start. Whenever enough
     // has arrived to play, pick it up again if we are still on this slide.
@@ -655,7 +679,13 @@
         is re-synced off the video's own clock, once a second, by the watchdog
         below. Nothing here trusts two clocks to stay together on their own. */
   var audioArmed = false;   // has the presenter done something we can count as consent
-  var audioOn    = true;    // sound is wanted by default; M is the kill switch
+  /* Off by default, and that is a deliberate reversal. It was on, because in a
+     room the presenter wants the rocket to be loud and reaching for M first is
+     a worse start than reaching for it to stop. But the deck is a link now,
+     and a link that starts making noise in someone's open tab is the wrong
+     first impression -- so the film opens muted and the speaker button on
+     slide 08 turns it up. M does the same thing from the keyboard. */
+  var audioOn    = false;
   var SYNC_SLIP  = 0.35;    // seconds of drift tolerated before we pull it back
 
   function slideAudio(slide) {
@@ -795,7 +825,7 @@
     live.querySelectorAll('video').forEach(function (v) {
       // a hidden video is deliberately parked, e.g. the loop that has not
       // taken over yet
-      if (v.style.display === 'none') return;
+      if (v.classList.contains('v-off')) return;
       // leave the reveal film alone once it has run: it is meant to hold its
       // last frame, not loop
       if (v.ended && !v.loop) return;
