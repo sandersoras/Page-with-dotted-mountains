@@ -15,6 +15,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet" />
 <!-- styles.css first, for the tokens and the reset. investor.css only adds. -->
+<link rel="icon" href="/favicon.ico" sizes="any" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 <link rel="stylesheet" href="../styles.css" />
 <link rel="stylesheet" href="../assets/investor/investor.css" />
 </head>
@@ -80,7 +85,7 @@
       <div class="film-label">
         <h2 class="label">Product render</h2>
       </div>
-      <a class="card" href="../assets/investor/strid-render.mp4"
+      <a class="card" href="../assets/investor/strid-render.mp4" data-overlay
          data-film="../assets/investor/strid-render.mp4"
          data-poster="../assets/investor/strid-render-poster.jpg">
         <img src="../assets/investor/strid-render-poster.jpg"
@@ -115,13 +120,80 @@
             stroke-linecap="round"/>
     </svg>
   </button>
-  <video id="playerVideo" controls playsinline preload="none"></video>
+  <div class="player-stage">
+    <video id="playerVideo" controls playsinline preload="none"></video>
+    <!-- The Matriarch ONE lockup from the end of the deck's product slide.
+         Shown only over the render, cued off the film's own clock, and inert
+         to the pointer so the browser's controls underneath stay usable. -->
+    <!-- Not aria-hidden. The name and the four specs are real product
+         information and they are not written anywhere else on this page, so
+         hiding them from a screen reader would lose them outright. The `hidden`
+         attribute the script sets is enough: it takes the block out of the
+         accessibility tree for the launch film, which has nothing to do with
+         it, and puts it back for the render. -->
+    <div class="ovl" id="ovl">
+      <span class="ovl-eyebrow">Our entry to the market</span>
+      <h2 class="ovl-name">Matriarch ONE</h2>
+      <div class="ovl-specs">
+        <div>
+          <div class="ovl-k">
+            <svg viewBox="0 0 34 24" fill="none" aria-hidden="true"><path d="M2,4 V20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/> <path d="M32,4 V20" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/> <path d="M10,12 H24" stroke="currentColor" stroke-width="2"/> <path d="M10.5,7 L4.5,12 L10.5,17 Z" fill="currentColor"/> <path d="M23.5,7 L29.5,12 L23.5,17 Z" fill="currentColor"/></svg>
+            Range
+          </div>
+          <div class="ovl-v">100 km operational radius</div>
+        </div>
+        <div>
+          <div class="ovl-k">
+            <svg viewBox="0 0 30 24" fill="none" aria-hidden="true"><g stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"> <path d="M2,4.5 H5.8"/> <path d="M16.2,4.5 H28"/> <path d="M2,12 H14.8"/> <path d="M25.2,12 H28"/> <path d="M2,19.5 H3.8"/> <path d="M14.2,19.5 H28"/> </g> <g stroke="currentColor" stroke-width="1.8" fill="none"> <circle cx="11" cy="4.5" r="3.2"/> <circle cx="20" cy="12" r="3.2"/> <circle cx="9" cy="19.5" r="3.2"/> </g></svg>
+            Control
+          </div>
+          <div class="ovl-v">Autonomous VTOL flight and deployment</div>
+        </div>
+        <div>
+          <div class="ovl-k">
+            <svg viewBox="0 0 21 24" fill="none" aria-hidden="true"><circle cx="4" cy="12" r="2.4" fill="currentColor"/> <g fill="none" stroke="currentColor" stroke-linecap="round"> <path d="M9.12,8.00 A6.5,6.5 0 0 1 9.12,16.00" stroke-width="2"/> <path d="M12.67,5.23 A11,11 0 0 1 12.67,18.77" stroke-width="1.8" opacity=".7"/> <path d="M16.21,2.46 A15.5,15.5 0 0 1 16.21,21.54" stroke-width="1.5" opacity=".45"/> </g></svg>
+            Comms and EW
+          </div>
+          <div class="ovl-v">IP based, redundant, built to keep the link</div>
+        </div>
+        <div>
+          <div class="ovl-k">
+            <svg viewBox="0 0 30 24" fill="none" aria-hidden="true"><path d="M4,7 H22 a6,6 0 0 1 0,12 H9" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/> <path d="M9.5,15.4 L3.5,19 L9.5,22.6 Z" fill="currentColor"/></svg>
+            Recovery
+          </div>
+          <div class="ovl-v">Flies home to be reloaded</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </dialog>
 
 <script>
 (function () {
   var dlg = document.getElementById('player');
   var vid = document.getElementById('playerVideo');
+  var ovl = document.getElementById('ovl');
+  var ovlOn = false;
+
+  // Cues, as a fraction of the film rather than in seconds, so re-cutting the
+  // render to a different length does not silently push the lockup past the
+  // end of it. The deck ran its specs at 12s of a 19.2s film and its name at
+  // 14s, which is 0.63 and 0.73, and the order is deliberate: the specs sweep
+  // in first and the name rises under them.
+  var CUE_SPECS = 0.63;
+  var CUE_NAME  = 0.73;
+
+  vid.addEventListener('timeupdate', function () {
+    if (!ovlOn || !vid.duration) return;
+    var t = vid.currentTime / vid.duration;
+    var on = [];
+    if (t >= CUE_SPECS) on.push('specs');
+    if (t >= CUE_NAME) on.push('name');
+    // Written as one attribute rather than as two classes so scrubbing
+    // backwards takes it away again, which is what the deck's R key did.
+    if (on.length) dlg.setAttribute('data-ovl', on.join(' '));
+    else dlg.removeAttribute('data-ovl');
+  });
 
   // Nothing is preloaded: the launch film is 18 MB, and every visitor to this
   // page is here for the deck first. The source is set on the click that opens
@@ -140,6 +212,11 @@
       // frame. The player's poster is a plain rectangular frame of the film.
       if (a.dataset.poster) vid.poster = a.dataset.poster;
       vid.src = a.dataset.film;
+      // Only the render carries the lockup. Cleared on every open so the
+      // launch film cannot inherit it from a previous view.
+      dlg.removeAttribute('data-ovl');
+      ovlOn = a.hasAttribute('data-overlay');
+      ovl.hidden = !ovlOn;
       dlg.showModal();
       var p = vid.play();
       // Autoplay with sound is allowed here because this runs inside the
@@ -155,6 +232,7 @@
     // buffering an 18 MB file in the background after the dialog is closed.
     vid.removeAttribute('src');
     vid.removeAttribute('poster');
+    dlg.removeAttribute('data-ovl');
     vid.load();
     if (dlg.open) dlg.close();
   }

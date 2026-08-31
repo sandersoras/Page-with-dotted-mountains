@@ -271,6 +271,151 @@
 .player-close:hover { color: #fff; }
 .player-close svg { width: 19px; height: 19px; }
 
+/* --- the Matriarch ONE lockup over the render -------------------------
+   Lifted from the end of the product slide in the HTML deck: the same words,
+   the same four spec glyphs, the same cue order (specs sweep in from the left
+   first, then the name rises), retimed to this film and recoloured to this
+   site. It only ever appears over the render; the launch film gets nothing.
+
+   COLOUR, AND WHY THE ACCENT IS A GROUND HERE AND NOT AN INK.
+
+   The deck had it easy: its own palette is cold white on near-black, so its
+   accent was a light blue that reads on a dark frame. This site's accent is
+   #8C2323, and against the render's near-black sky that is about 2.1:1 --
+   nowhere near enough for 13px type. So nothing on this overlay is set in
+   accent. The type is one warm cream, --bg, at three strengths, which is this
+   site's own paper colour and the reason the block still reads as this site
+   rather than as the deck.
+
+   The accent gets in as the eyebrow's pill, where it is the fill and the text
+   on it is --on-accent. Same trick as the OPEN DECK pill on the page behind,
+   which is also why it does not look like a new component.
+
+   POSITION. The film's aircraft holds the upper middle for the whole closing
+   run and the bottom third is empty sky, checked frame by frame from 14s to
+   the end, so the block sits down there and never crosses the subject. It
+   clears 56px for the browser's own control bar, which lives in exactly the
+   same corner and is the one thing on screen that must stay clickable --
+   hence pointer-events:none on the whole overlay. */
+.player-stage {
+  position: relative;
+  line-height: 0;
+}
+.ovl {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0 clamp(20px, 4%, 56px) clamp(56px, 9%, 92px);
+  pointer-events: none;
+  line-height: 1.5;
+}
+/* A floor under the type, so it does not depend on the frame behind it. */
+.ovl::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 300%;
+  background: linear-gradient(to top,
+    rgba(10, 10, 9, 0.94) 0%, rgba(10, 10, 9, 0.88) 30%,
+    rgba(10, 10, 9, 0.60) 58%, rgba(10, 10, 9, 0.22) 80%, transparent 100%);
+  opacity: 0;
+  transition: opacity 1.1s ease;
+}
+/* Stacking, and it took a wrong turn first. The scrim was z-index:-1, which on
+   a pseudo-element whose parent creates no stacking context drops it below the
+   parent's own content -- and below the video, since the video is the earlier
+   sibling in .player-stage. It was painting behind the film. It sits at 0 now
+   and the type is lifted to 1 over it: video, then scrim, then words. */
+.ovl::before { z-index: 0; }
+.ovl > * { position: relative; z-index: 1; }
+.player[data-ovl] .ovl::before { opacity: 1; }
+
+.ovl-eyebrow {
+  display: inline-block;
+  padding: 6px 12px 5px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--mono);
+  font-size: clamp(9px, 0.78vw, 11.5px);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.ovl-name {
+  margin: 14px 0 0;
+  color: var(--bg);
+  font-size: clamp(30px, 4.6vw, 68px);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+}
+.ovl-specs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(16px, 2.4%, 40px);
+  margin-top: clamp(16px, 2.2%, 32px);
+}
+.ovl-k {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: rgba(231, 229, 223, 0.62);
+  font-family: var(--mono);
+  font-size: clamp(9px, 0.76vw, 11.5px);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.ovl-k svg { height: 1.35em; width: auto; flex: none; }
+.ovl-v {
+  margin-top: 6px;
+  color: rgba(231, 229, 223, 0.94);
+  font-size: clamp(11px, 1.05vw, 16px);
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+/* The two cues, in the deck's order: the specs come in from the left, then
+   the name rises under them. Nothing is in the flow until the film asks for
+   it, and both stay once they arrive. */
+.ovl-eyebrow, .ovl-name, .ovl-specs {
+  opacity: 0;
+  transition: opacity 0.9s cubic-bezier(0.16, 0.84, 0.32, 1),
+              transform 0.9s cubic-bezier(0.16, 0.84, 0.32, 1);
+}
+.ovl-specs { transform: translateX(-34px); }
+.ovl-eyebrow, .ovl-name { transform: translateY(24px); }
+.player[data-ovl~="specs"] .ovl-specs,
+.player[data-ovl~="name"] .ovl-eyebrow,
+.player[data-ovl~="name"] .ovl-name { opacity: 1; transform: none; }
+
+/* Four spec columns will not fit beside each other on a phone-width player. */
+@media (max-width: 760px) {
+  .ovl-specs { grid-template-columns: repeat(2, 1fr); }
+  .ovl { padding-bottom: clamp(46px, 8%, 70px); }
+}
+
+/* And under 600 they do not fit at all. A 16:9 film in 390px of width is 219px
+   tall; the name and four specs need about 190 of that, so the overlay ate the
+   frame and the aircraft was a shape behind text. The specs go and the lockup
+   stays, which is the deck's own hierarchy -- the name was its second cue and
+   the one the slide was built around. Nothing is lost that is not still one tap
+   away in the deck itself.
+
+   Shrinking further was the other option and it is not one: the mono labels are
+   already at the 9px floor of their clamp. */
+@media (max-width: 600px) {
+  .ovl-specs { display: none; }
+  .ovl::before { height: 200%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ovl-eyebrow, .ovl-name, .ovl-specs, .ovl::before { transition: none; }
+}
+
 /* --- footer -------------------------------------------------------------
    The front page's footer classes are defined in its own inline <style>, not
    in styles.css, so they cannot be reused here. The `footer` element rule is

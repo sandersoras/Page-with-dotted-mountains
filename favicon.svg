@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<!--
+     STRID tab icon.
+
+     The apex of the mark, not the mark. All 27 dots of the full mark inside a
+     16px tab come out as a grey smudge; this is the three rightmost lattice
+     columns, which is the part that reads as an arrow, taken as a subset of
+     the real coordinates rather than redrawn. Dots are weighted 1.22x for the
+     same reason type is optically sized at small settings: unweighted they
+     disappear into a 16px raster.
+
+     The cream tile is not decoration, it is what makes the icon work. A bare
+     ink mark on transparent is invisible against a dark browser chrome, and a
+     bare accent one is muddy there. The tile carries its own ground, so this
+     is the same icon in every browser with no colour scheme switching.
+-->
+<rect width="64" height="64" rx="14" fill="#E7E5DF"/>
+<g fill="#1A1A18">
+  <circle cx="17.925" cy="9.132" r="3.333"/>
+  <circle cx="26.918" cy="18.216" r="3.626"/>
+  <circle cx="36.037" cy="27.253" r="3.938"/>
+  <circle cx="45.054" cy="36.441" r="4.579"/>
+  <circle cx="26.517" cy="36.477" r="3.168"/>
+  <circle cx="36.011" cy="45.548" r="3.873"/>
+  <circle cx="26.893" cy="54.633" r="3.619"/>
+</g>
+</svg>
