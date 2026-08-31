@@ -1,0 +1,317 @@
+/* ==========================================================================
+   STRID · investor page
+   ==========================================================================
+
+   Two pages use this file and nothing else does: /vc/ and /angel/. They are
+   the same page with a different deck behind the top card.
+
+   IDENTITY COMES FROM styles.css, WHICH EVERY PAGE LINKS FIRST. That file
+   carries the tokens (--bg, --ink, --accent, --sans, --mono), the reset, the
+   film grain, .wrap, .eyebrow, .logo and the sticky `header` and `footer`
+   element rules. This file adds only what these two pages need on top, so
+   there is one place to change a colour and it is not here.
+
+   Safe to link the whole 19 KB of it: nothing in styles.css hides content
+   until script runs. The scroll-reveal rules that do (`[data-reveal]`) live
+   in the inline <style> of the front page, not in the shared sheet, which is
+   why no element here carries that attribute.
+
+   THE LAYOUT IS THREE CARDS. The deck is one full-width 16:9 card and the two
+   films sit under it in a row. See .film-row for why that row is not two
+   equal columns.
+   ========================================================================== */
+
+:root {
+  /* One radius for the deck and the render. The rocket thumbnail does not use
+     it -- its corners are cut into the image itself, because they were drawn
+     that way in the source and a CSS radius cannot follow a raster corner at
+     every viewport width.
+
+     So this number is set FROM the rocket rather than the other way round.
+     That corner is 6.36% of the picture's width, which on the 523px the film
+     row gives it at full measure is 33px. Matching it here is what makes the
+     three cards read as one set; re-cutting the rocket to a smaller radius
+     would have matched them too, and would have meant redrawing someone
+     else's artwork to fit a CSS file. The narrow value below is the same sum
+     at the width a phone gives it. */
+  --card-r: 33px;
+  --card-shadow: 0 1px 2px rgba(26, 26, 24, 0.06),
+                 0 12px 32px -8px rgba(26, 26, 24, 0.14);
+  --card-shadow-lift: 0 2px 4px rgba(26, 26, 24, 0.07),
+                      0 26px 56px -12px rgba(26, 26, 24, 0.22);
+}
+
+/* --- header ---------------------------------------------------------------
+   The `header` element rule in styles.css already makes this stick with a
+   blurred ground, and `nav.wrap` already sets the flex row and its height.
+   All that is left is the label on the right. */
+.inv-nav {
+  border-bottom: 1px solid var(--line);
+}
+.inv-which {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+/* --- the page -------------------------------------------------------------
+   padding-block, not `padding`. This element is also a .wrap, and .wrap's
+   whole job is the 32px side gutter; a `padding` shorthand here loads after
+   styles.css and quietly zeroed it, which is invisible on a desktop where the
+   1180 measure is narrower than the window anyway, and put every card flush
+   against both edges of a phone. */
+.inv-main {
+  position: relative;
+  z-index: 1;
+  padding-top: 72px;
+  padding-bottom: 96px;
+}
+.inv-head {
+  max-width: 34ch;
+  margin-bottom: 44px;
+}
+.inv-head .eyebrow { margin-bottom: 18px; }
+.inv-head h1 {
+  font-size: clamp(30px, 4.4vw, 46px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+}
+.inv-head .a-accent { color: var(--accent); }
+
+/* --- a card --------------------------------------------------------------
+   Every card is a link wrapping one image. The image sets the height: it is
+   width:100% with height:auto, so the card is exactly the picture's aspect
+   ratio and nothing is ever cropped or letterboxed. */
+.card {
+  display: block;
+  position: relative;
+  border-radius: var(--card-r);
+  box-shadow: var(--card-shadow);
+  transition: transform 0.32s cubic-bezier(0.2, 0.7, 0.3, 1),
+              box-shadow 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.card:hover, .card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow: var(--card-shadow-lift);
+}
+.card img, .card video {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: inherit;
+}
+/* The rocket thumbnail's corners are cut into the image as alpha, so the card
+   adds no radius -- a CSS radius on top would clip a second, differently
+   sized arc inside the first one.
+
+   Its shadow has to change tool for the same reason. box-shadow traces the
+   element's border box, which is still a square here, so it painted shadow
+   across the four transparent corner notches. drop-shadow follows the alpha
+   channel instead, so the shadow rounds with the picture. The numbers are the
+   two layers of --card-shadow written out, because filter takes no list of
+   shorthand values. */
+.card--baked {
+  border-radius: 0;
+  box-shadow: none;
+}
+.card--baked img {
+  border-radius: 0;
+  filter: drop-shadow(0 1px 2px rgba(26, 26, 24, 0.06))
+          drop-shadow(0 12px 32px rgba(26, 26, 24, 0.14));
+  transition: filter 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.card--baked:hover, .card--baked:focus-visible { box-shadow: none; }
+.card--baked:hover img, .card--baked:focus-visible img {
+  filter: drop-shadow(0 2px 4px rgba(26, 26, 24, 0.07))
+          drop-shadow(0 26px 56px rgba(26, 26, 24, 0.22));
+}
+
+/* --- the deck -----------------------------------------------------------
+   A white 16:9 sheet on a warm ground needs a hairline or it floats. The
+   deck cover is page one of the PDF, rendered at the file's own 1920x1080,
+   which is exactly 2x the widest this card is ever drawn. */
+.deck-card {
+  /* Narrower than the measure on purpose. At full width the cover was 1116 x
+     628 and filled a laptop window on its own, so the two films below it were
+     entirely below the fold and the page read as one big picture. 78% keeps it
+     comfortably the largest object here -- 870 x 489 against 494 x 335 for the
+     widest film -- without being the only one. Flush left, like everything
+     else on the page. */
+  width: 78%;
+  margin-bottom: 74px;
+  outline: 1px solid var(--line-strong);
+  outline-offset: -1px;
+}
+
+/* The affordance, and it is not a hover state on purpose: half the people
+   this link is sent to will open it on a phone, where there is no hover and
+   an image that silently happens to be a link is an image. */
+.open-pill {
+  position: absolute;
+  left: 22px;
+  bottom: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 17px;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: gap 0.28s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.open-pill svg { width: 13px; height: 13px; flex: none; }
+.card:hover .open-pill { gap: 14px; }
+
+/* --- the two films -----------------------------------------------------
+   NOT two equal columns. The rocket thumbnail is 1.473:1 and the render is
+   16:9, and in equal columns one of them has to be cropped or boxed to match
+   the other's height. Columns in proportion to the two aspect ratios instead:
+   the pictures then come out exactly the same height, the row still fills the
+   measure, and neither loses a pixel. Change a source image's shape and these
+   two numbers have to change with it. */
+.film-row {
+  display: grid;
+  grid-template-columns: 1.4733fr 1.7778fr;
+  gap: 26px;
+  align-items: start;
+}
+.film-label {
+  margin-bottom: 16px;
+}
+.film-label .label {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Accent rather than the usual white circle: the rocket sits on a bright sky
+   and the render on near-black, and one badge has to read on both. */
+.play {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 74px;
+  height: 74px;
+  margin: -37px 0 0 -37px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: var(--on-accent);
+  display: grid;
+  place-items: center;
+  box-shadow: 0 6px 22px -4px rgba(26, 26, 24, 0.45);
+  transition: transform 0.32s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+.play svg {
+  width: 22px;
+  height: 22px;
+  /* the glyph is a triangle, so its optical centre is right of its box */
+  margin-left: 4px;
+}
+.card:hover .play, .card:focus-visible .play { transform: scale(1.08); }
+
+/* --- the player ---------------------------------------------------------
+   One dialog serves both films; the script swaps the source. It is a <dialog>
+   rather than a div so Escape, focus trapping and the top layer come from the
+   browser instead of from script. */
+.player {
+  border: 0;
+  padding: 0;
+  /* inset + margin:auto, spelled out. A modal dialog is centred by most user
+     agents already, but not all of them, and the one that did not put the
+     video against the top edge of the window with its close button off
+     screen above it. */
+  inset: 0;
+  margin: auto;
+  width: min(1400px, 94vw);
+  max-width: min(1400px, 94vw);
+  max-height: 94vh;
+  background: transparent;
+  overflow: visible;
+}
+.player::backdrop {
+  background: rgba(16, 15, 14, 0.88);
+  backdrop-filter: blur(6px);
+}
+.player video {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 88vh;
+  border-radius: 14px;
+  background: #000;
+}
+/* Fixed to the window, not to the dialog. The dialog is the video's own
+   height, which is unknown until the file's metadata arrives and can be 94vh
+   once it does; a button hung 46px above that edge ends up above the window.
+   A dialog in the top layer positions `fixed` against the viewport, so this
+   corner is the same corner whatever the film turns out to be. */
+.player-close {
+  position: fixed;
+  top: 18px;
+  right: 22px;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  background: none;
+  color: #cfcbc2;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+}
+.player-close:hover { color: #fff; }
+.player-close svg { width: 19px; height: 19px; }
+
+/* --- footer -------------------------------------------------------------
+   The front page's footer classes are defined in its own inline <style>, not
+   in styles.css, so they cannot be reused here. The `footer` element rule is
+   shared; these three are the same shapes written again. */
+.inv-footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.inv-footer-inner .logo {
+  font-size: 15px;
+  letter-spacing: 0.04em;
+  color: var(--ink-faint);
+}
+.inv-footer-inner .logo-mark { width: 15px; height: 15px; opacity: 0.85; }
+.inv-footer-inner .copy {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  color: var(--ink-faint);
+}
+
+/* --- narrow ---------------------------------------------------------------
+   One column under 760. The proportional grid above is the whole reason the
+   row worked; stacked, each card is simply its own picture at full width. */
+@media (max-width: 760px) {
+  /* 375px of card at 6.36% */
+  :root { --card-r: 24px; }
+  .inv-main { padding-top: 44px; padding-bottom: 64px; }
+  /* Full width on a phone: 78% of 335 is a postage stamp, and there is no
+     film beside it to be measured against down here anyway. */
+  .deck-card { width: 100%; margin-bottom: 46px; }
+  .film-row { grid-template-columns: 1fr; gap: 44px; }
+  .open-pill { left: 14px; bottom: 14px; padding: 9px 14px; font-size: 10.5px; }
+  .play { width: 60px; height: 60px; margin: -30px 0 0 -30px; }
+  .play svg { width: 18px; height: 18px; }
+  .player-close { top: 12px; right: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .play, .open-pill { transition: none; }
+  .card:hover, .card:focus-visible { transform: none; }
+}

@@ -1,6 +1,14 @@
-# The deck is investor material and should not be indexed. This asks crawlers
-# not to fetch it; deck/index.html also carries <meta name="robots"
-# content="noindex, nofollow, noarchive">, which is what covers a crawler that
-# ignores this file or reached the page from a link somewhere else. Keep both.
+# Investor material, none of it for search results.
+#
+# Two directories are sent out as links and nothing on the site points at
+# them. This file asks a crawler not to fetch them; each page also carries
+# <meta name="robots" content="noindex, nofollow, noarchive">, which is what
+# covers a crawler that ignores this file or arrived from a link somewhere
+# else. Keep both.
+#
+# Note what this is not: strid.so is a static site with no login, so a link is
+# unlisted, not protected. Anyone holding the URL is in, and a forwarded email
+# hands it on. Treat both links as public the moment they leave your outbox.
 User-agent: *
-Disallow: /deck/
+Disallow: /vc/
+Disallow: /angel/

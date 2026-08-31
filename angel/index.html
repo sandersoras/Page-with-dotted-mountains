@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>STRID — Angel deck</title>
+<!-- Unlisted, so this is the only thing standing between the deck and a
+     search result. robots.txt at the site root disallows the two directories
+     as well; that asks a crawler not to fetch, this tells one that already
+     has not to publish. noarchive is the one that matters most: without it a
+     cached copy stays readable after the page is taken down. -->
+<meta name="robots" content="noindex, nofollow, noarchive" />
+<meta name="referrer" content="no-referrer" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&amp;family=JetBrains+Mono:wght@500;600&amp;display=swap" rel="stylesheet" />
+<!-- styles.css first, for the tokens and the reset. investor.css only adds. -->
+<link rel="stylesheet" href="../styles.css" />
+<link rel="stylesheet" href="../assets/investor/investor.css" />
+</head>
+<body>
+
+<div class="noise" aria-hidden="true"></div>
+
+<header>
+  <nav class="wrap inv-nav">
+    <a href="https://strid.so" class="logo">
+      <img src="../assets/logo-mark.png" class="logo-mark" alt="" />
+      STRID
+    </a>
+    <span class="inv-which">Confidential</span>
+  </nav>
+</header>
+
+<main class="wrap inv-main">
+
+  <div class="inv-head">
+    <span class="eyebrow">Investor material</span>
+    <h1>Angel <span class="a-accent">deck</span></h1>
+  </div>
+
+  <!-- The deck. The preview is page one of the PDF beside this file, rendered
+       at the file's own 1920x1080, and the link goes straight to the PDF so
+       the browser's own viewer opens it. New tab on purpose: the two films
+       below are the reason this page exists, and navigating away in place
+       loses them behind a back button. -->
+  <a class="card deck-card" href="strid-angel-deck.pdf" target="_blank" rel="noopener">
+    <img src="cover.png" width="1920" height="1080"
+         alt="First page of the STRID angel deck: Drone carrier fleets for Europe." />
+    <span class="open-pill">
+      Open deck
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M2 8h11M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8"
+              stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+  </a>
+
+  <div class="film-row">
+
+    <div>
+      <div class="film-label">
+        <h2 class="label">Watch our rocket launch</h2>
+      </div>
+      <!-- card--baked: this thumbnail's rounded corners and drop shadow are
+           drawn into the artwork, so the card adds neither. -->
+      <a class="card card--baked" href="../assets/investor/rocket-launch.mp4"
+         data-film="../assets/investor/rocket-launch.mp4"
+         data-poster="../assets/investor/rocket-launch-frame.jpg">
+        <img src="../assets/investor/rocket-launch-poster.webp"
+             width="1600" height="1086"
+             alt="The rocket on its launch rail at Nansen, annotated: rocket we just built." />
+        <span class="play" aria-hidden="true">
+          <svg viewBox="0 0 18 18" fill="currentColor"><path d="M3.5 1.6 15.2 9 3.5 16.4Z"/></svg>
+        </span>
+      </a>
+    </div>
+
+    <div>
+      <div class="film-label">
+        <h2 class="label">Product render</h2>
+      </div>
+      <a class="card" href="../assets/investor/strid-render.mp4"
+         data-film="../assets/investor/strid-render.mp4"
+         data-poster="../assets/investor/strid-render-poster.jpg">
+        <img src="../assets/investor/strid-render-poster.jpg"
+             width="1920" height="1080"
+             alt="Matriarch ONE in flight with four FPV drones released beneath it." />
+        <span class="play" aria-hidden="true">
+          <svg viewBox="0 0 18 18" fill="currentColor"><path d="M3.5 1.6 15.2 9 3.5 16.4Z"/></svg>
+        </span>
+      </a>
+    </div>
+
+  </div>
+</main>
+
+<footer>
+  <div class="wrap inv-footer-inner">
+    <a href="https://strid.so" class="logo">
+      <img src="../assets/logo-mark.png" class="logo-mark" alt="" />
+      STRID
+    </a>
+    <span class="copy">© 2026 Strid, Oslo, Norway</span>
+  </div>
+</footer>
+
+<!-- The player. One dialog for both films; the click handler sets the source.
+     A <dialog> rather than a div so Escape, the top layer and focus handling
+     come from the browser. -->
+<dialog class="player" id="player" aria-label="Video player">
+  <button class="player-close" id="playerClose" aria-label="Close">
+    <svg viewBox="0 0 18 18" fill="none" aria-hidden="true">
+      <path d="M2 2l14 14M16 2 2 16" stroke="currentColor" stroke-width="1.8"
+            stroke-linecap="round"/>
+    </svg>
+  </button>
+  <video id="playerVideo" controls playsinline preload="none"></video>
+</dialog>
+
+<script>
+(function () {
+  var dlg = document.getElementById('player');
+  var vid = document.getElementById('playerVideo');
+
+  // Nothing is preloaded: the launch film is 18 MB, and every visitor to this
+  // page is here for the deck first. The source is set on the click that opens
+  // the dialog, which is also the gesture that lets it play with sound.
+  document.querySelectorAll('[data-film]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      // href points at the file itself, so a browser with no <dialog> support
+      // and a crawler both still reach the video. Only take over the click
+      // when we can actually do better than that.
+      if (typeof dlg.showModal !== 'function') return;
+      e.preventDefault();
+      // Poster first, so the dialog opens on a picture rather than on a black
+      // rectangle while the file starts arriving. Note this is NOT the card's
+      // thumbnail: that one has its corners cut out of it, and inside the
+      // player the transparent notches showed as four black nicks against the
+      // frame. The player's poster is a plain rectangular frame of the film.
+      if (a.dataset.poster) vid.poster = a.dataset.poster;
+      vid.src = a.dataset.film;
+      dlg.showModal();
+      var p = vid.play();
+      // Autoplay with sound is allowed here because this runs inside the
+      // click, but a browser can still refuse. If it does the controls are
+      // already there and the poster frame is showing, so nothing is broken.
+      if (p && p.catch) p.catch(function () {});
+    });
+  });
+
+  function shut() {
+    vid.pause();
+    // Drop the source as well as pausing. Left attached, the browser keeps
+    // buffering an 18 MB file in the background after the dialog is closed.
+    vid.removeAttribute('src');
+    vid.removeAttribute('poster');
+    vid.load();
+    if (dlg.open) dlg.close();
+  }
+
+  document.getElementById('playerClose').addEventListener('click', shut);
+  dlg.addEventListener('close', shut);
+  // Escape fires `cancel` before `close`; both end up in shut().
+  dlg.addEventListener('click', function (e) {
+    // The dialog box is the video's own size, so a click that lands on the
+    // element itself rather than on a child is a click on the backdrop.
+    if (e.target === dlg) shut();
+  });
+})();
+</script>
+
+</body>
+</html>
