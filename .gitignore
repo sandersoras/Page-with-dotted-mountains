@@ -1,0 +1,5 @@
+# macOS writes these into every directory it has ever displayed. This repo is
+# published as-is to strid.so, so anything committed here is served: a
+# .DS_Store on a web root leaks the directory listing, including the names of
+# files nothing links to.
+.DS_Store
