@@ -305,10 +305,19 @@
     will-change: transform, opacity;
   }
   .product-visual.is-visible { opacity: 1; transform: none; }
+  /* height:auto is load-bearing, not tidiness. The width and height attributes
+     on the <img> are there for the aspect ratio, which stops the section
+     jumping while the render decodes -- but they also land as presentational
+     hints for the CSS width and height properties. The phone rule below
+     overrides width and says nothing about height, so the height attribute
+     stayed in force: the box came out 335 wide by 252 tall against a picture
+     that is 2.55:1, and object-fit defaults to fill, so the aircraft was
+     squeezed sideways. Any img given those attributes needs this. */
   .product-plane {
     display: block;
     max-width: 640px;
     width: 100%;
+    height: auto;
     margin: 0 auto;
     will-change: transform;
   }
@@ -754,8 +763,8 @@
     <div class="wrap product-stage">
       <h2 class="product-heading">STRID <span class="a-accent">One</span></h2>
       <div class="product-visual">
-        <img src="assets/matriarch-one.webp" class="product-plane" width="642" height="252"
-             alt="Matriarch ONE releasing five FPV drones from its bay." />
+        <img src="assets/matriarch-one.webp" class="product-plane" width="1400" height="548"
+             alt="Matriarch ONE seen from above, releasing five FPV drones from its bay." />
       </div>
       <div class="product-specs">
         <span class="spec-title">Specifications</span>
