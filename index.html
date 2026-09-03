@@ -746,7 +746,16 @@
           <img src="assets/logo-mark.png" class="logo-mark" alt="" />
           <h1>STRID</h1>
         </div>
-        <p class="giant-sub"><span class="sub-line">Advancing the <span class="a-accent">frontline</span></span><span class="sub-line">for allied forces.</span></p>
+        <!-- Three lines, not two, and the breaks are measured rather than chosen.
+             .sub-line is nowrap (see the rule) so a line cannot re-wrap under
+             the scramble, which means it overflows instead if it is too long.
+             Set as one line this reads 981px against a 1116px column at full
+             size -- fine there, but the type stops shrinking at the 1.5rem
+             floor while the column keeps going, so it spills between roughly
+             740 and 780px of viewport. Broken here the longest line is 509px
+             and there is no width at which it does not fit. Both breaks fall on
+             phrase boundaries. -->
+        <p class="giant-sub"><span class="sub-line">Autonomous carrier systems</span><span class="sub-line">for an everchanging battlefield.</span><span class="sub-line">Built for <span class="a-accent">Europe</span>.</span></p>
       </div>
     </div>
     <div class="scroll-cue" aria-hidden="true">
